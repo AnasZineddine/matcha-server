@@ -51,16 +51,14 @@ CREATE TABLE users
     from_user_id VARCHAR
     (255) NOT NULL,
     to_user_id VARCHAR
-    (255) NOT NULL
-);
+    (255) NOT NULL);
 
     CREATE TABLE profile_look (
     look_id INT GENERATED ALWAYS AS IDENTITY,
     from_user_id VARCHAR
     (255) NOT NULL,
     to_user_id VARCHAR
-    (255) NOT NULL
-    );
+    (255) NOT NULL);
 
     CREATE TABLE notifications (
         notif_id INT GENERATED ALWAYS AS IDENTITY,
@@ -70,15 +68,12 @@ CREATE TABLE users
     (255) NOT NULL,
         notif_type VARCHAR
     (255) NOT NULL,
-        is_read BOOLEAN NOT NULL DEFAULT FALSE,
-    );
+        is_read BOOLEAN NOT NULL DEFAULT FALSE);
 
     CREATE TABLE black_list(
         black_list INT GENERATED ALWAYS AS IDENTITY,
         token VARCHAR NOT NULL,
-        timestamp timestamp NOT NULL DEFAULT NOW
-    ()
-    );
+        timestamp timestamp NOT NULL DEFAULT NOW());
 
     -- https://www.the-art-of-web.com/sql/trigger-delete-old/
     CREATE FUNCTION delete_old_rows() RETURNS trigger
@@ -96,13 +91,10 @@ $$;
     AFTER
     INSERT ON
     black_list
-    EXECUTE PROCEDURE delete_old_rows
-    ();
+    EXECUTE PROCEDURE delete_old_rows();
 
     CREATE TABLE reported_users (
         report_id INT GENERATED ALWAYS AS IDENTITY,
-        from_user_id VARCHAR
-    (255) NOT NULL,
-        to_user_id VARCHAR
-    (255) NOT NULL,
-        timestamp timestamp NOT NULL DEFAULT NOW);
+        from_user_id VARCHAR(255) NOT NULL,
+        to_user_id VARCHAR (255) NOT NULL,
+    timestamp timestamp NOT NULL DEFAULT NOW);
