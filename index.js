@@ -11,6 +11,8 @@ const server = new ApolloServer({
   typeDefs,
   resolvers,
   context: ({ req }) => ({ req, pubsub }),
+  introspection: true,
+  playground: true,
 });
 
 server.listen({ port: port }).then((res) => {
