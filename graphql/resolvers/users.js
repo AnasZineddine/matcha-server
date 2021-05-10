@@ -32,7 +32,7 @@ function isLongitude(lng) {
 
 module.exports = {
   Mutation: {
-    async login(_, { username, password }) {
+    async login(_, { username, password }, { req }) {
       const { errors, valid } = validateLoginInput(username, password);
       if (!valid) {
         throw new UserInputError("Errors", { errors });
@@ -58,6 +58,14 @@ module.exports = {
       }
 
       const token = generateToken(user);
+      const options = {
+        maxAge: 1000 * 60 * 60 * 24, //expires in a day
+        httpOnly: true, // cookie is only accessible by the server
+        // secure: process.env.NODE_ENV === 'prod', // only transferred over https
+        // sameSite: true, // only sent for requests to the same FQDN as the domain in the cookie
+      };
+      const cookie = req.res.cookie("refresh_token", token, options);
+
       return {
         username,
         token,
