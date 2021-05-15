@@ -629,6 +629,33 @@ module.exports = {
         return false;
       }
     },
+
+    async refreshToken(_, {}, { req }) {
+      if (!req.headers.cookie) {
+        throw new Error("Invalid token");
+      }
+      const token = req.headers.cookie.split("=")[1];
+
+      try {
+        const payload = jwt.verify(token, process.env.jwtSecret);
+        const user = await pool.query(
+          "SELECT * from users WHERE user_id = $1",
+          [payload.id]
+        );
+        if (user.rows.length === 0) {
+          return {
+            token: "",
+          };
+        }
+        const accessToken = generateToken(user);
+        return {
+          id: user.rows[0].user_id,
+          token: accessToken,
+        };
+      } catch (err) {
+        throw new Error("Invalid/expired token");
+      }
+    },
   },
   Query: {
     async browseUsers(_, args, context) {

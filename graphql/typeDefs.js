@@ -109,6 +109,7 @@ module.exports = gql`
     blockUser(userToBlockId: String!): Boolean!
     logOut: Boolean!
     reportUser(userId: String!): Boolean!
+    refreshToken: User!
   }
 
   type Subscription {
