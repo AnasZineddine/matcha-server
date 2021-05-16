@@ -179,14 +179,11 @@ module.exports = {
     },
     async resetPassword(
       _,
-      { resetInput: { password, confirmPassword, resetToken } },
+      { resetInput: { password, resetToken } },
       context,
       info
     ) {
       //TODO: validate input agaaaaaaaain and throw Userinputerror of apollo
-      if (password !== confirmPassword) {
-        throw new Error("Your passwords don't match");
-      }
       const user = await pool.query(
         "SELECT * FROM users WHERE reset_password_token = $1",
         [resetToken]

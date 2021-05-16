@@ -28,7 +28,6 @@ module.exports = gql`
 
   input ResetInput {
     password: String!
-    confirmPassword: String!
     resetToken: String!
   }
 
