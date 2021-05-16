@@ -133,6 +133,21 @@ module.exports = {
         token,
       };
     },
+
+    async resendConfirmationEmail(_, { userEmail }) {
+      const user = await pool.query("SELECT * from users WHERE user_email=$1", [
+        userEmail,
+      ]);
+      if (user.rows.length === 0) {
+        throw new UserInputError("Email not associated with any account");
+      } else if (user.rows[0].is_verified === true) {
+        throw new UserInputError("Email already verified");
+      } else {
+        sendConfirmationEmail(user);
+        return true;
+      }
+    },
+
     async confirmEmail(_, { token }) {
       try {
         const verifyToken = jwt.verify(token, process.env.jwtSecret);

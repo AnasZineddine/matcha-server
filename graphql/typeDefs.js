@@ -109,6 +109,7 @@ module.exports = gql`
     logOut: Boolean!
     reportUser(userId: String!): Boolean!
     refreshToken: User!
+    resendConfirmationEmail(userEmail: String!): Boolean!
   }
 
   type Subscription {
