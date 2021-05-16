@@ -596,7 +596,7 @@ module.exports = {
       try {
         await pool.query(
           "UPDATE users SET user_last_connected = current_timestamp WHERE user_id = $1",
-          [user_id]
+          [user.id]
         );
         await pool.query("INSERT INTO black_list (token) VALUES ($1)", [token]);
         return true;
