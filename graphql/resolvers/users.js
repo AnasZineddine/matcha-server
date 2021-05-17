@@ -203,7 +203,11 @@ module.exports = {
         "SELECT * FROM users WHERE reset_password_token = $1",
         [resetToken]
       );
-      if (user.rows.length === 0 /* || TODO: check expiracy date here ??*/) {
+      if (
+        user.rows.length === 0 ||
+        user.rows[0].reset_password_token !==
+          resetToken /* || TODO: check expiracy date here ??*/
+      ) {
         //errors.general =
         //"Your password reset token is either invalid or expired.";
         throw new UserInputError(
