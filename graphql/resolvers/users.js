@@ -652,6 +652,7 @@ module.exports = {
       }
       const token = req.headers.cookie.split("=")[1];
 
+      console.log(req);
       try {
         const payload = jwt.verify(token, process.env.jwtSecret);
         const user = await pool.query(
