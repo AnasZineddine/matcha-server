@@ -8,7 +8,6 @@ const pubsub = new PubSub();
 const port = process.env.PORT || 5000;
 
 const server = new ApolloServer({
-  cors: false,
   typeDefs,
   resolvers,
   context: ({ req }) => ({ req, pubsub }),
