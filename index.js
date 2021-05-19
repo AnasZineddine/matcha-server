@@ -9,7 +9,7 @@ const port = process.env.PORT || 5000;
 
 const server = new ApolloServer({
   cors: {
-    origin: "*", // <- allow request from all domains
+    origin: "http://localhost:3000", // <- allow request from all domains
     credentials: true,
   },
   typeDefs,
