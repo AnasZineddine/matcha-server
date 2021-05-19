@@ -1,4 +1,5 @@
-const { ApolloServer, PubSub } = require("apollo-server");
+const { ApolloServer, PubSub } = require("apollo-server-express");
+const express = require("express");
 
 const typeDefs = require("./graphql/typeDefs");
 const resolvers = require("./graphql/resolvers");
@@ -19,6 +20,14 @@ const server = new ApolloServer({
   playground: true,
 });
 
-server.listen({ port: port }).then((res) => {
+const app = express();
+server.applyMiddleware({ app });
+
+app.listen({ port: port }, () =>
+  console.log(
+    `🚀 Server ready at http://localhost:${port}${server.graphqlPath}`
+  )
+);
+/*server.listen({ port: port }).then((res) => {
   console.log(`Server running at ${res.url}`);
-});
+});*/
