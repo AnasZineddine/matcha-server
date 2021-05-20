@@ -23,6 +23,7 @@ CREATE TABLE users
     is_complete BOOLEAN NOT NULL DEFAULT FALSE,
     reset_password_token VARCHAR(255) NOT NULL DEFAULT 0,--??????
     reset_password_expiry VARCHAR(255),
+    user_birthday VARCHAR(255) NOT NULL,
     user_gender gender,
     user_sexual_preference sexual_preference DEFAULT 'Bisexual',
     user_biography VARCHAR(600),

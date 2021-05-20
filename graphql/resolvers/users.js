@@ -347,7 +347,7 @@ module.exports = {
         return false;
       }
     },
-    /*async addBirthday(_, { birthday }, context, info) {
+    async modifyBirthday(_, { birthday }, context, info) {
       const user = await checkAuth(context);
       var date = new Date();
       var currentYear = date.getFullYear();
@@ -370,7 +370,7 @@ module.exports = {
         console.log(error);
         return false;
       }
-    },*/
+    },
     async addAge(_, { age }, context) {
       const user = await checkAuth(context);
       if (!lodash.isNumber(age)) {
@@ -945,6 +945,28 @@ module.exports = {
         connected: checkMatch.rowCount === 2 ? true : false,
         //TODO:RETURN other infos of user
       };
+    },
+    async getUser(_, {}, context) {
+      const user = await checkAuth(context);
+      try {
+        const userData = await pool.query(
+          "SELECT * FROM users WHERE user_id =$1"[user.id]
+        );
+        return {
+          firstName: userData.rows[0].user_first_name,
+          lastName: userData.rows[0].user_last_name,
+          username: userData.rows[0].username,
+          email: userData.rows[0].user_email,
+          birthday: userData.rows[0].user_birthday,
+          sexualPreference: userData.rows[0].user_sexual_preference,
+          biography: userData.rows[0].user_biography,
+          score: userData.rows[0].user_score,
+          gender: userData.rows[0].user_gender,
+          interests: userData.rows[0].user_interests,
+        };
+      } catch (error) {
+        console.log(error);
+      }
     },
   },
   //},

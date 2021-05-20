@@ -13,7 +13,10 @@ module.exports = gql`
     email: String
     token: String
     distance: Int
+    gender: String
+    sexualPreference: String
     age: Int
+    birthday: String
     interests: [String]
     connected: Boolean
   }
@@ -82,6 +85,7 @@ module.exports = gql`
     uploads: [File]
     browseUsers(orderBy: OrderByInput, filterBy: FilterByInput): [User]
     checkProfile(profileId: ID): User
+    getUser: User
   }
 
   type Mutation {
@@ -94,6 +98,7 @@ module.exports = gql`
     modifyLastName(lastName: String!): Boolean!
     modifyEmail(email: String!): Boolean!
     modifyPosition(lat: Float!, lon: Float!): Boolean!
+    modifyBirthday(birthday: String!): Boolean!
     addGender(gender: Gender!): Boolean!
     addSexualPreference(sexualPreference: SexualPreference!): Boolean!
     addBiography(biography: String!): Boolean!
