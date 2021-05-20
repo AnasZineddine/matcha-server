@@ -14,6 +14,8 @@ module.exports = gql`
     token: String
     distance: Int
     gender: String
+    biography: String
+    score: Int
     sexualPreference: String
     age: Int
     birthday: String
