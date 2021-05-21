@@ -950,7 +950,8 @@ module.exports = {
       const user = await checkAuth(context);
       try {
         const userData = await pool.query(
-          "SELECT * FROM users WHERE user_id =$1"[user.id]
+          "SELECT * FROM users WHERE user_id =$1",
+          [user.id]
         );
         return {
           firstName: userData.rows[0].user_first_name,
