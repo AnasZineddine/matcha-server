@@ -21,6 +21,8 @@ module.exports = gql`
     birthday: String
     interests: [String]
     connected: Boolean
+    lat: Float
+    lon: Float
   }
 
   input RegisterInput {

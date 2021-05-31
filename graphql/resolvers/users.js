@@ -229,7 +229,7 @@ module.exports = {
       try {
         await pool.query(
           "UPDATE users SET user_gender = $1 WHERE user_id = $2",
-          [gender[0] /*FIXME:change in database*/, user.id]
+          [gender /*FIXME:change in database*/, user.id]
         );
       } catch (e) {
         console.log(e);
@@ -426,7 +426,7 @@ module.exports = {
 
     async addInterrest(_, { interest }, context) {
       const user = await checkAuth(context);
-      if (!/^#[A-Za-z]+$/.test(interest) || interest.length > 50) {
+      if (!/^[A-Za-z]+$/.test(interest) || interest.length > 50) {
         throw new UserInputError("Invalid interest");
       }
       //TODO:regex for interests : ^#[A-Za-z]+$ && lenght
@@ -688,35 +688,35 @@ module.exports = {
         );
       } else if (
         userData.rows[0].user_sexual_preference === "Homosexual" &&
-        userData.rows[0].user_gender === "M"
+        userData.rows[0].user_gender === "Male"
       ) {
         //TODO: MATCH gender && check for empty arrays && only completed profiles
         sameSexualPreference = await pool.query(
-          "SELECT * from users WHERE user_sexual_preference = $1 AND user_gender = 'M' AND user_id != $2",
+          "SELECT * from users WHERE user_sexual_preference = $1 AND user_gender = 'Male' AND user_id != $2",
           [userData.rows[0].user_sexual_preference, user.id]
         );
       } else if (
         userData.rows[0].user_sexual_preference === "Homosexual" &&
-        userData.rows[0].user_gender === "F"
+        userData.rows[0].user_gender === "Female"
       ) {
         sameSexualPreference = await pool.query(
-          "SELECT * from users WHERE user_sexual_preference = $1 AND user_gender = 'F' AND user_id != $2",
+          "SELECT * from users WHERE user_sexual_preference = $1 AND user_gender = 'Female' AND user_id != $2",
           [userData.rows[0].user_sexual_preference, user.id]
         );
       } else if (
         userData.rows[0].user_sexual_preference === "Heterosexual" &&
-        userData.rows[0].user_gender === "M"
+        userData.rows[0].user_gender === "Male"
       ) {
         sameSexualPreference = await pool.query(
-          "SELECT * from users WHERE user_sexual_preference = $1 AND user_gender = 'F' AND user_id != $2",
+          "SELECT * from users WHERE user_sexual_preference = $1 AND user_gender = 'Female' AND user_id != $2",
           [userData.rows[0].user_sexual_preference, user.id]
         );
       } else if (
         userData.rows[0].user_sexual_preference === "Homosexual" &&
-        userData.rows[0].user_gender === "F"
+        userData.rows[0].user_gender === "Female"
       ) {
         sameSexualPreference = await pool.query(
-          "SELECT * from users WHERE user_sexual_preference = $1 AND user_gender = 'M' AND user_id != $2",
+          "SELECT * from users WHERE user_sexual_preference = $1 AND user_gender = 'Male' AND user_id != $2",
           [userData.rows[0].user_sexual_preference, user.id]
         );
       }
@@ -964,6 +964,8 @@ module.exports = {
           score: userData.rows[0].user_score,
           gender: userData.rows[0].user_gender,
           interests: userData.rows[0].user_interests,
+          lat: userData.rows[0].user_lat,
+          lon: userData.rows[0].user_lon,
         };
       } catch (error) {
         console.log(error);
