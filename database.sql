@@ -5,7 +5,7 @@ create extension
 if not exists "uuid-ossp";
 
 CREATE TYPE gender AS ENUM
-('M', 'F');
+('Male', 'Female');
 
 Create TYPE sexual_preference AS ENUM
 ('Heterosexual', 'Bisexual', 'Homosexual');

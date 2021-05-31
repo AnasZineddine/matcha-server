@@ -226,7 +226,6 @@ module.exports = {
 
     async addGender(_, { gender }, context, info) {
       const user = await checkAuth(context);
-      console.log(gender);
       try {
         await pool.query(
           "UPDATE users SET user_gender = $1 WHERE user_id = $2",
@@ -475,10 +474,16 @@ module.exports = {
               "UPDATE users SET user_lat = $1, user_lon = $2, user_city = $3 WHERE user_id = $4",
               [response.lat, response.lon, response.city, user.id]
             );
-            return true;
+            const userData = await pool.query(
+              "SELECT * from users WHERE user_id = $1",
+              [user.id]
+            );
+            return {
+              lat: userData.rows[0].user_lat,
+              lon: userData.rows[0].user_lon,
+            };
           } catch (e) {
             console.log(e);
-            return false;
           }
           //console.log(response.lat);
           //console.log(response.lon);

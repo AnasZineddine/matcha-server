@@ -111,7 +111,7 @@ module.exports = gql`
     addInterrests(interests: [InterestInput]): Boolean!
     addInterrest(interest: String!): Boolean!
     removeInterrest(interest: String!): Boolean!
-    forceGeolocation(string: String!): Boolean!
+    forceGeolocation: User!
     likeUser(userToLikeId: String!): Boolean!
     unLikeUser(userToUnlikeId: String!): Boolean!
     blockUser(userToBlockId: String!): Boolean!
