@@ -230,7 +230,7 @@ module.exports = {
       try {
         await pool.query(
           "UPDATE users SET user_gender = $1 WHERE user_id = $2",
-          [gender /*FIXME:change in database*/, user.id]
+          [gender /*FIXMEE:change in database*/, user.id]
         );
       } catch (e) {
         console.log(e);
