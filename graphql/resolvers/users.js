@@ -226,6 +226,7 @@ module.exports = {
 
     async addGender(_, { gender }, context, info) {
       const user = await checkAuth(context);
+      console.log(gender);
       try {
         await pool.query(
           "UPDATE users SET user_gender = $1 WHERE user_id = $2",
