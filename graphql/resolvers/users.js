@@ -394,8 +394,8 @@ module.exports = {
     // upload not complete yet need frontend ??
     //ref : https://www.youtube.com/watch?v=BcZ_ItGplfE&ab_channel=Classsed
     async uploadFile(parent, { file }) {
-      const { createReadStream, filename, mimetype, encoding } = await file;
-      const stream = createReadStream();
+      const { stream, filename, mimetype, encoding } = await file;
+      //onst stream = stream();
       const pathName = path.join(__dirname, `/public/images/${filename}`);
       await stream.pipe(fs.createWriteStream(pathName));
       return {
