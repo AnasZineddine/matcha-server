@@ -15,6 +15,7 @@ const server = new ApolloServer({
   },
   typeDefs,
   resolvers,
+  uploads: false,
   context: ({ req }) => ({ req, pubsub }),
   introspection: true,
   playground: true,
