@@ -29,6 +29,7 @@
     "xmlhttprequest": "^1.8.0"
   },
   "resolutions": {
+    "fs-capacitor": "^6.2.0",
     "graphql-upload": "^11.0.0"
  }
 }
