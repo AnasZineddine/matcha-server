@@ -395,6 +395,7 @@ module.exports = {
     //ref : https://www.youtube.com/watch?v=BcZ_ItGplfE&ab_channel=Classsed
     async uploadFile(parent, { file }) {
       const { stream, filename, mimetype, encoding } = await file;
+      console.log(stream);
       //onst stream = stream();
       const pathName = path.join(__dirname, `/public/images/${filename}`);
       await stream.pipe(fs.createWriteStream(pathName));
