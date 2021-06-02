@@ -396,7 +396,7 @@ module.exports = {
     async uploadFile(parent, { file }) {
       const { createReadStream, filename, mimetype, encoding } = await file;
       console.log(file);
-      const stream = createReadStream();
+      const stream = await createReadStream();
       const pathName = path.join(__dirname, `/public/images/${filename}`);
       console.log("here");
       console.log(pathName);
