@@ -394,24 +394,20 @@ module.exports = {
     // upload not complete yet need frontend ??
     //ref : https://www.youtube.com/watch?v=BcZ_ItGplfE&ab_channel=Classsed
     async uploadFile(parent, { file }) {
-      try {
-        const { createReadStream, filename, mimetype, encoding } = await file;
-        console.log(file);
-        const stream = createReadStream();
-        const pathName = path.join(__dirname, `/public/images/${filename}`);
-        console.log("here");
-        console.log(pathName);
-        //await stream.pipe(fs.createWriteStream(pathName));
-        await new Promise((resolve, reject) => {
-          const writeStream = fs.createWriteStream(pathName);
-          stream.pipe(writeStream).on("finish", resolve).on("error", reject);
-        });
-        return {
-          url: `http://localhost:4000/images/${filename}`,
-        };
-      } catch (error) {
-        console.log(error);
-      }
+      const { createReadStream, filename, mimetype, encoding } = await file;
+      console.log(file);
+      const stream = createReadStream();
+      const pathName = path.join(__dirname, `/public/images/${filename}`);
+      console.log("here");
+      console.log(pathName);
+      //await stream.pipe(fs.createWriteStream(pathName));
+      await new Promise((resolve, reject) => {
+        const writeStream = fs.createWriteStream(pathName);
+        stream.pipe(writeStream).on("finish", resolve).on("error", reject);
+      });
+      return {
+        url: `http://localhost:4000/images/${filename}`,
+      };
     },
     //TODO:regex for interests : ^#[A-Za-z]+$ && lenght
     async addInterrests(_, { interests }, context, info) {
