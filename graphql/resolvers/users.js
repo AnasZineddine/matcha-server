@@ -393,7 +393,6 @@ module.exports = {
     },
     // upload not complete yet need frontend ??
     //ref : https://www.youtube.com/watch?v=BcZ_ItGplfE&ab_channel=Classsed
-    Upload: GraphQLUpload,
     async uploadFile(parent, { file }) {
       const { createReadStream, filename, mimetype, encoding } = await file;
       console.log(createReadStream);

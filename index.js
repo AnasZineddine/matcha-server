@@ -15,7 +15,10 @@ const server = new ApolloServer({
   },
   typeDefs,
   resolvers,
-  uploads: false,
+  uploads: {
+    maxFileSize: 10000000, // 10 MB
+    maxFiles: 20,
+  },
   context: ({ req }) => ({ req, pubsub }),
   introspection: true,
   playground: true,
