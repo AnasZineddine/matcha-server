@@ -394,14 +394,18 @@ module.exports = {
     // upload not complete yet need frontend ??
     //ref : https://www.youtube.com/watch?v=BcZ_ItGplfE&ab_channel=Classsed
     async uploadFile(parent, { file }) {
-      const { createReadStream, filename, mimetype, encoding } = await file;
-      console.log(createReadStream);
-      const stream = createReadStream();
-      const pathName = path.join(__dirname, `/public/images/${filename}`);
-      await stream.pipe(fs.createWriteStream(pathName));
-      return {
-        url: `http://localhost:4000/images/${filename}`,
-      };
+      try {
+        const { createReadStream, filename, mimetype, encoding } = await file;
+        console.log(file);
+        const stream = createReadStream();
+        const pathName = path.join(__dirname, `/public/images/${filename}`);
+        await stream.pipe(fs.createWriteStream(pathName));
+        return {
+          url: `http://localhost:4000/images/${filename}`,
+        };
+      } catch (error) {
+        console.log(error);
+      }
     },
     //TODO:regex for interests : ^#[A-Za-z]+$ && lenght
     async addInterrests(_, { interests }, context, info) {
