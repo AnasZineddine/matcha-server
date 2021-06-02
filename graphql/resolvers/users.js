@@ -401,7 +401,11 @@ module.exports = {
         const pathName = path.join(__dirname, `/public/images/${filename}`);
         console.log("here");
         console.log(pathName);
-        await stream.pipe(fs.createWriteStream(pathName));
+        //await stream.pipe(fs.createWriteStream(pathName));
+        await new Promise((resolve, reject) => {
+          const writeStream = fs.createWriteStream(pathName);
+          stream.pipe(writeStream).on("finish", resolve).on("error", reject);
+        });
         return {
           url: `http://localhost:4000/images/${filename}`,
         };
