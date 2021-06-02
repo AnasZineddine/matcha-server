@@ -1,6 +1,6 @@
 const bcrypt = require("bcryptjs");
 require("dotenv").config();
-const { UserInputError } = require("apollo-server");
+const { UserInputError, GraphQLUpload } = require("apollo-server");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const path = require("path");
@@ -393,6 +393,7 @@ module.exports = {
     },
     // upload not complete yet need frontend ??
     //ref : https://www.youtube.com/watch?v=BcZ_ItGplfE&ab_channel=Classsed
+    Upload: GraphQLUpload,
     async uploadFile(parent, { file }) {
       const { createReadStream, filename, mimetype, encoding } = await file;
       console.log(createReadStream);

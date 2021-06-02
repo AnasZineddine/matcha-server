@@ -8,7 +8,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index"
+    "start": "node index",
+    "preinstall": "npx npm-force-resolutions"
   },
   "keywords": [],
   "author": "",
@@ -29,5 +30,9 @@
     "nodemailer-sendgrid": "^1.0.3",
     "pg": "^8.5.1",
     "xmlhttprequest": "^1.8.0"
+  },
+  "resolutions": {
+    "fs-capacitor":"^6.2.0",
+    "graphql-upload": "^11.0.0"
   }
 }
