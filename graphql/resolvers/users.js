@@ -30,6 +30,19 @@ function isLongitude(lng) {
   return isFinite(lng) && Math.abs(lng) <= 180;
 }
 
+function generateRandomString(length) {
+  var result = [];
+  var characters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  var charactersLength = characters.length;
+  for (var i = 0; i < length; i++) {
+    result.push(
+      characters.charAt(Math.floor(Math.random() * charactersLength))
+    );
+  }
+  return result.join("");
+}
+
 module.exports = {
   Mutation: {
     async login(_, { username, password }, { req }) {
@@ -393,20 +406,26 @@ module.exports = {
     },
     // upload not complete yet need frontend ??
     //ref : https://www.youtube.com/watch?v=BcZ_ItGplfE&ab_channel=Classsed
-    async uploadFile(parent, { file }) {
+    async uploadFile(parent, { file }, context) {
+      const user = await checkAuth(context);
       const { createReadStream, filename, mimetype, encoding } = await file;
-      console.log(file);
+      const { ext } = path.parse(filename);
+      const randomName = generateRandomString(50) + ext;
       const stream = await createReadStream();
-      const pathName = path.join(__dirname, `/public/images/${filename}`);
-      console.log("here");
-      console.log(pathName);
-      //await stream.pipe(fs.createWriteStream(pathName));
+      if (!fs.existsSync(path.join(__dirname, `/public/images/${user.id}/`))) {
+        fs.mkdirSync(path.join(__dirname, `/public/images/${user.id}/`));
+      }
+      const pathName = path.join(
+        __dirname,
+        `/public/images/${user.id}/${randomName}`
+      );
+      /* await stream.pipe(fs.createWriteStream(pathName)); */
       await new Promise((resolve, reject) => {
         const writeStream = fs.createWriteStream(pathName);
         stream.pipe(writeStream).on("finish", resolve).on("error", reject);
       });
       return {
-        url: `http://localhost:4000/images/${filename}`,
+        url: `http://localhost:5000/images/${user.id}/${randomName}`,
       };
     },
     //TODO:regex for interests : ^#[A-Za-z]+$ && lenght
