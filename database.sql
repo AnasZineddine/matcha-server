@@ -40,6 +40,12 @@ CREATE TABLE users
     -- ????????
     );
 
+    CREATE TABLE photos(
+        id_user VARCHAR(255) NOT NULL,
+        profile_picture VARCHAR(255) NOT NULL,
+        regular_pictures TEXT[],
+    );
+
     CREATE TABLE likes (
     like_id INT GENERATED ALWAYS AS IDENTITY,
     from_user_id VARCHAR

@@ -85,6 +85,11 @@ module.exports = gql`
     message: String
   }
 
+  enum Type {
+    profile
+    regular
+  }
+
   type Query {
     uploads: [File]
     browseUsers(orderBy: OrderByInput, filterBy: FilterByInput): [User]
@@ -106,7 +111,7 @@ module.exports = gql`
     addGender(gender: Gender!): Boolean!
     addSexualPreference(sexualPreference: SexualPreference!): Boolean!
     addBiography(biography: String!): Boolean!
-    uploadFile(file: Upload!): File!
+    uploadFile(file: Upload!, type: Type!): File!
     addAge(age: Int!): Boolean!
     addInterrests(interests: [InterestInput]): Boolean!
     addInterrest(interest: String!): Boolean!
