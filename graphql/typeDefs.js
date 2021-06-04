@@ -23,6 +23,8 @@ module.exports = gql`
     connected: Boolean
     lat: Float
     lon: Float
+    profilePicture: String
+    regularPictures: [String]
   }
 
   input RegisterInput {

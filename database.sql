@@ -31,6 +31,8 @@ CREATE TABLE users
     user_last_connected TIMESTAMP,
     user_interests TEXT
     [],
+    profile_picture VARCHAR(255),
+    regular_pictures TEXT[],
     user_lon NUMERIC NOT NULL DEFAULT 0,
     user_lat NUMERIC NOT NULL DEFAULT 0,
     user_city VARCHAR
@@ -38,12 +40,6 @@ CREATE TABLE users
     user_score smallint DEFAULT 0
     -- user_biography VARCHAR(255) NOT NULL
     -- ????????
-    );
-
-    CREATE TABLE photos(
-        id_user VARCHAR(255) NOT NULL,
-        profile_picture VARCHAR(255) NOT NULL,
-        regular_pictures TEXT[],
     );
 
     CREATE TABLE likes (

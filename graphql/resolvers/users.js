@@ -407,39 +407,44 @@ module.exports = {
     // upload not complete yet need frontend ??
     //ref : https://www.youtube.com/watch?v=BcZ_ItGplfE&ab_channel=Classsed
     async uploadFile(parent, { file, type }, context) {
-      const user = await checkAuth(context);
-      const { createReadStream, filename, mimetype, encoding } = await file;
-      const { ext } = path.parse(filename);
-      const randomName = generateRandomString(50) + ext;
-      const stream = await createReadStream();
-      if (!fs.existsSync(path.join(__dirname, `/public/images/${user.id}/`))) {
-        fs.mkdirSync(path.join(__dirname, `/public/images/${user.id}/`));
-      }
-      const pathName = path.join(
-        __dirname,
-        `/public/images/${user.id}/${randomName}`
-      );
-      /* await stream.pipe(fs.createWriteStream(pathName)); */
-      await new Promise((resolve, reject) => {
-        const writeStream = fs.createWriteStream(pathName);
-        stream.pipe(writeStream).on("finish", resolve).on("error", reject);
-      });
-      const url = `http://localhost:5000/images/${user.id}/${randomName}`;
-      if (type === "profile") {
-        await pool.query(
-          "INSERT INTO photos (id_user, profile_picture) VALUES($1, $2)",
-          [user.id, url]
+      try {
+        const user = await checkAuth(context);
+        const { createReadStream, filename, mimetype, encoding } = await file;
+        const { ext } = path.parse(filename);
+        const randomName = generateRandomString(50) + ext;
+        const stream = await createReadStream();
+        if (
+          !fs.existsSync(path.join(__dirname, `/public/images/${user.id}/`))
+        ) {
+          fs.mkdirSync(path.join(__dirname, `/public/images/${user.id}/`));
+        }
+        const pathName = path.join(
+          __dirname,
+          `/public/images/${user.id}/${randomName}`
         );
-      } else if (type === "regular") {
-        await pool.query("INSERT INTO photos (id_user) VALUES($1)", [user.id]);
-        await pool.query(
-          "UPDATE photos SET regular_photos = array_append(regular_photos, $1) WHERE id_user = $2",
-          [url, user.id]
-        );
+        /* await stream.pipe(fs.createWriteStream(pathName)); */
+        await new Promise((resolve, reject) => {
+          const writeStream = fs.createWriteStream(pathName);
+          stream.pipe(writeStream).on("finish", resolve).on("error", reject);
+        });
+        const url = `http://localhost:5000/images/${user.id}/${randomName}`;
+        if (type === "profile") {
+          await pool.query(
+            "UPDATE users SET profile_picture = $1 WHERE user_id = $2",
+            [url, user.id]
+          );
+        } else if (type === "regular") {
+          await pool.query(
+            "UPDATE users SET regular_pictures = array_append(regular_pictures, $1) WHERE user_id = $2",
+            [url, user.id]
+          );
+        }
+        return {
+          url: url,
+        };
+      } catch (error) {
+        console.log(error);
       }
-      return {
-        url: url,
-      };
     },
     //TODO:regex for interests : ^#[A-Za-z]+$ && lenght
     async addInterrests(_, { interests }, context, info) {
@@ -1011,6 +1016,8 @@ module.exports = {
           interests: userData.rows[0].user_interests,
           lat: userData.rows[0].user_lat,
           lon: userData.rows[0].user_lon,
+          profilePicture: userData.rows[0].profile_picture,
+          regularPictures: userData.rows[0].regular_pictures,
         };
       } catch (error) {
         console.log(error);
