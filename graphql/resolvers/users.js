@@ -21,6 +21,7 @@ const {
 const { generateToken } = require("../../util/generateToken");
 const checkAuth = require("../../util/checkAuth");
 const { getDistanceFromLatLonInKm } = require("../../util/getDistance");
+const { isCompositeType } = require("graphql");
 
 function isLatitude(lat) {
   return isFinite(lat) && Math.abs(lat) <= 90;
@@ -375,8 +376,12 @@ module.exports = {
       }
       try {
         await pool.query(
-          "UPDATE users SET user_birthday = $1 WHERE user_id = $2",
-          [birthday, user.id]
+          "UPDATE users SET user_birthday = $1, user_age = $3 WHERE user_id = $2",
+          [
+            birthday,
+            user.id,
+            currentYear - parseInt(birthday.split("-")[0], 10),
+          ]
         );
         return true;
       } catch (error) {
@@ -733,7 +738,7 @@ module.exports = {
       let sameSexualPreference;
       if (userData.rows[0].user_sexual_preference === "Bisexual") {
         sameSexualPreference = await pool.query(
-          "SELECT * from users WHERE user_id != $1 AND user_sexual_preference = 'Bisexual'",
+          "SELECT * from users WHERE user_id != $1 AND is_complete ='t' AND user_sexual_preference = 'Bisexual'",
           [user.id]
         );
       } else if (
@@ -742,7 +747,7 @@ module.exports = {
       ) {
         //TODO: MATCH gender && check for empty arrays && only completed profiles
         sameSexualPreference = await pool.query(
-          "SELECT * from users WHERE user_sexual_preference = $1 AND user_gender = 'Male' AND user_id != $2",
+          "SELECT * from users WHERE user_sexual_preference = $1 AND user_gender = 'Male' AND is_complete='t' AND user_id != $2",
           [userData.rows[0].user_sexual_preference, user.id]
         );
       } else if (
@@ -750,7 +755,7 @@ module.exports = {
         userData.rows[0].user_gender === "Female"
       ) {
         sameSexualPreference = await pool.query(
-          "SELECT * from users WHERE user_sexual_preference = $1 AND user_gender = 'Female' AND user_id != $2",
+          "SELECT * from users WHERE user_sexual_preference = $1 AND user_gender = 'Female' AND user_id != $2 AND is_complete='t'",
           [userData.rows[0].user_sexual_preference, user.id]
         );
       } else if (
@@ -758,7 +763,7 @@ module.exports = {
         userData.rows[0].user_gender === "Male"
       ) {
         sameSexualPreference = await pool.query(
-          "SELECT * from users WHERE user_sexual_preference = $1 AND user_gender = 'Female' AND user_id != $2",
+          "SELECT * from users WHERE user_sexual_preference = $1 AND user_gender = 'Female' AND user_id != $2 AND is_complete='t'",
           [userData.rows[0].user_sexual_preference, user.id]
         );
       } else if (
@@ -766,7 +771,7 @@ module.exports = {
         userData.rows[0].user_gender === "Female"
       ) {
         sameSexualPreference = await pool.query(
-          "SELECT * from users WHERE user_sexual_preference = $1 AND user_gender = 'Male' AND user_id != $2",
+          "SELECT * from users WHERE user_sexual_preference = $1 AND user_gender = 'Male' AND user_id != $2 AND is_complete='t'",
           [userData.rows[0].user_sexual_preference, user.id]
         );
       }
@@ -780,6 +785,8 @@ module.exports = {
         browseSuggestions.push({
           firstName: user.user_first_name,
           lastName: user.user_last_name,
+          id: user.user_id,
+          profilePicture: user.profile_picture,
           username: user.username,
           age: user.user_age,
           score: user.user_score,
@@ -997,8 +1004,8 @@ module.exports = {
       };
     },
     async getUser(_, {}, context) {
-      const user = await checkAuth(context);
       try {
+        const user = await checkAuth(context);
         const userData = await pool.query(
           "SELECT * FROM users WHERE user_id =$1",
           [user.id]
@@ -1007,6 +1014,7 @@ module.exports = {
           firstName: userData.rows[0].user_first_name,
           lastName: userData.rows[0].user_last_name,
           username: userData.rows[0].username,
+          age: userData.rows[0].user_age,
           email: userData.rows[0].user_email,
           birthday: userData.rows[0].user_birthday,
           sexualPreference: userData.rows[0].user_sexual_preference,
@@ -1019,6 +1027,29 @@ module.exports = {
           profilePicture: userData.rows[0].profile_picture,
           regularPictures: userData.rows[0].regular_pictures,
         };
+      } catch (error) {
+        console.log(error);
+      }
+    },
+
+    async checkIfComplete(_, {}, context) {
+      try {
+        const user = await checkAuth(context);
+        const userData = await pool.query(
+          "SELECT user_biography,user_gender,user_interests,profile_picture,user_birthday FROM users WHERE user_id=$1",
+          [user.id]
+        );
+        //console.log(userData);
+        //TODO: check the veracity of below statement
+        if (lodash.some(userData.rows[0], lodash.isEmpty)) {
+          return false;
+        } else {
+          await pool.query(
+            "UPDATE users SET is_complete = $1 WHERE user_id = $2",
+            [true, user.id]
+          );
+          return true;
+        } //test
       } catch (error) {
         console.log(error);
       }

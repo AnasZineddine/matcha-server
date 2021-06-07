@@ -97,6 +97,7 @@ module.exports = gql`
     browseUsers(orderBy: OrderByInput, filterBy: FilterByInput): [User]
     checkProfile(profileId: ID): User
     getUser: User
+    checkIfComplete: Boolean
   }
 
   type Mutation {
