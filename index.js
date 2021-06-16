@@ -1,5 +1,6 @@
 const { ApolloServer, PubSub } = require("apollo-server-express");
 const express = require("express");
+const http = require("http");
 
 const typeDefs = require("./graphql/typeDefs");
 const resolvers = require("./graphql/resolvers");
@@ -27,9 +28,12 @@ const server = new ApolloServer({
 const app = express();
 server.applyMiddleware({ app });
 
+const httpServer = http.createServer(app);
+server.installSubscriptionHandlers(httpServer);
+
 app.use(express.static("graphql/resolvers/public"));
 
-app.listen({ port: port }, () =>
+httpServer.listen({ port: port }, () =>
   console.log(
     `🚀 Server ready at http://localhost:${port}${server.graphqlPath}`
   )

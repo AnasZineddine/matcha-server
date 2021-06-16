@@ -92,12 +92,21 @@ module.exports = gql`
     regular
   }
 
+  type Message {
+    id: ID!
+    from: String!
+    to: String!
+    content: String!
+    createdAt: String!
+  }
+
   type Query {
     uploads: [File]
     browseUsers(orderBy: OrderByInput, filterBy: FilterByInput): [User]
     checkProfile(profileId: ID): User
     getUser: User
     checkIfComplete: Boolean
+    getMessages(from: String!): [Message]!
   }
 
   type Mutation {
@@ -127,9 +136,11 @@ module.exports = gql`
     reportUser(userId: String!): Boolean!
     refreshToken: User!
     resendConfirmationEmail(userEmail: String!): Boolean!
+    sendMessage(to: String!, content: String!): Message!
   }
 
   type Subscription {
     newNotification: notification
+    newMessage: Message
   }
 `;

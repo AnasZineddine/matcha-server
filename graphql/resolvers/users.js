@@ -508,6 +508,7 @@ module.exports = {
     //https://ip-api.com/docs/api:json
     async forceGeolocation(_, {}, context) {
       const user = await checkAuth(context);
+      console(context.req.connection.remoteAddress);
       var endpoint =
         "http://ip-api.com/json/?fields=status,message,lat,lon,city";
       var xhr = new XMLHttpRequest();
@@ -725,6 +726,48 @@ module.exports = {
         };
       } catch (err) {
         throw new Error("Invalid/expired token");
+      }
+    },
+
+    async sendMessage(parent, { to, content }, context) {
+      try {
+        //TODO:handle input security of to and content
+        const user = await checkAuth(context);
+        const recipient = await pool.query(
+          "SELECT user_id FROM users WHERE user_id = $1",
+          [to]
+        );
+        if (recipient.rows.length === 0) {
+          throw new UserInputError("User not found");
+        }
+        if (content.trim() === "") {
+          throw new UserInputError("message is empty");
+        }
+
+        const message = await pool.query(
+          "INSERT INTO messages (from_user_id, to_user_id, content) VALUES ($1, $2, $3) RETURNING *",
+          [user.id, to, content]
+        );
+
+        context.pubsub.publish("NEW_MESSAGE", {
+          newMessage: {
+            id: message.rows[0].message_id,
+            from: user.id,
+            to: to,
+            content: content,
+            createdAt: message.rows[0].created_at,
+          },
+        });
+
+        return {
+          id: message.rows[0].message_id,
+          from: user.id,
+          to: to,
+          content: content,
+          createdAt: message.rows[0].created_at,
+        };
+      } catch (error) {
+        console.log(error);
       }
     },
   },
@@ -1054,7 +1097,37 @@ module.exports = {
         console.log(error);
       }
     },
+    async getMessages(_, { from }, context) {
+      try {
+        const user = await checkAuth(context);
+        const otherUser = await pool.query(
+          "SELECT user_id FROM users WHERE user_id = $1",
+          [from]
+        );
+        if (otherUser.rows.length === 0) {
+          throw new UserInputError("user not found");
+        }
+        const messages = await pool.query(
+          "SELECT * FROM messages WHERE (from_user_id =$1 AND to_user_id = $2) OR (from_user_id =$2 AND to_user_id = $1) ORDER BY created_at",
+          [from, user.id]
+        );
+        const messagesArray = [];
+        for (let message of messages.rows) {
+          messagesArray.push({
+            id: message.message_id,
+            from: message.from_user_id,
+            to: message.to_user_id,
+            content: message.content,
+            createdAt: message.created_at,
+          });
+        }
+        return messagesArray;
+      } catch (error) {
+        console.log(error);
+      }
+    },
   },
+
   //},
   Subscription: {
     newNotification: {
@@ -1071,6 +1144,12 @@ module.exports = {
           from: notif.rows[0].from_user_id,
           message: notif.rows[0].notif_message,
         };
+      },
+    },
+
+    newMessage: {
+      subscribe: async (_, __, { pubsub }) => {
+        return pubsub.asyncIterator(["NEW_MESSAGE"]);
       },
     },
   },
