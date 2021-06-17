@@ -1126,6 +1126,24 @@ module.exports = {
         console.log(error);
       }
     },
+
+    async getMatchedUsers(_, {}, context) {
+      try {
+        const user = await checkAuth(context);
+        const matched = await pool.query("", [user.id]);
+        console.log(user.id);
+        console.log(matched);
+        return [
+          {
+            id: "google",
+            username: "dummy",
+            profilePicture: "google.com",
+          },
+        ];
+      } catch (error) {
+        console.log(error);
+      }
+    },
   },
 
   //},

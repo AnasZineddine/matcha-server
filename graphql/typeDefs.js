@@ -107,6 +107,7 @@ module.exports = gql`
     getUser: User
     checkIfComplete: Boolean
     getMessages(from: String!): [Message]!
+    getMatchedUsers: [User]!
   }
 
   type Mutation {
