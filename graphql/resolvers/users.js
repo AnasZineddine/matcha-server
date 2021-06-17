@@ -1,6 +1,6 @@
 const bcrypt = require("bcryptjs");
 require("dotenv").config();
-const { UserInputError, GraphQLUpload } = require("apollo-server");
+const { UserInputError, GraphQLUpload, withFilter } = require("apollo-server");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const path = require("path");
@@ -1148,8 +1148,18 @@ module.exports = {
     },
 
     newMessage: {
-      subscribe: async (_, __, { pubsub }) => {
-        return pubsub.asyncIterator(["NEW_MESSAGE"]);
+      async subscribe(rootValue, args, context) {
+        const user = await checkAuth(context);
+        return withFilter(
+          () => context.pubsub.asyncIterator(["NEW_MESSAGE"]),
+          async ({ newMessage }, _, context) => {
+            const user = await checkAuth(context);
+            if (newMessage.from === user.id || newMessage.to === user.id) {
+              return true;
+            }
+            return false;
+          }
+        )(rootValue, args, context);
       },
     },
   },
