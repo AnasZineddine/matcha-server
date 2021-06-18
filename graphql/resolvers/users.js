@@ -432,7 +432,7 @@ module.exports = {
           const writeStream = fs.createWriteStream(pathName);
           stream.pipe(writeStream).on("finish", resolve).on("error", reject);
         });
-        const url = `http://localhost:5000/images/${user.id}/${randomName}`;
+        const url = `/images/${user.id}/${randomName}`;
         if (type === "profile") {
           await pool.query(
             "UPDATE users SET profile_picture = $1 WHERE user_id = $2",
