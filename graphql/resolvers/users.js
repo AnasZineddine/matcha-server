@@ -599,7 +599,7 @@ module.exports = {
             [user.id, userToLikeId]
           );
           await pool.query(
-            "INSERT INTO notifications (from_user_id, to_user_id, notif_message) VALUES($1, $2, $3)",
+            "INSERT INTO notifications (from_user_id, to_user_id, notif_type) VALUES($1, $2, $3)",
             [user.id, userToLikeId, "like"]
           );
           const checkMatch = await pool.query(
@@ -608,8 +608,12 @@ module.exports = {
           );
           if (checkMatch.rowCount === 1) {
             await pool.query(
-              "INSERT INTO notifications (from_user_id, to_user_id, notif_message) VALUES ($1, $2, $3)",
+              "INSERT INTO notifications (from_user_id, to_user_id, notif_type) VALUES ($1, $2, $3)",
               [user.id, userToLikeId, "match"]
+            );
+            await pool.query(
+              "INSERT INTO matches (from_user_id, to_user_id) VALUES ($1, $2)",
+              [user.id, userToLikeId]
             );
           }
         } catch (e) {
@@ -653,8 +657,12 @@ module.exports = {
           );
           if (checkMatch.rowCount === 2) {
             await pool.query(
-              "INSERT INTO notifications (from_user_id, to_user_id, notif_message) VALUES ($1, $2, $3)",
+              "INSERT INTO notifications (from_user_id, to_user_id, notif_type) VALUES ($1, $2, $3)",
               [user.id, userToUnlikeId, "connected unlike"]
+            );
+            await pool.query(
+              "DELETE FROM matches WHERE (from_user_id = $1 AND to_user_id = $2) OR (from_user_id = $2 AND to_user_id = $1)",
+              [user.id, userToUnlikeId]
             );
           }
         } catch (err) {
@@ -1026,7 +1034,7 @@ module.exports = {
           [user.id, profileId]
         );
         await pool.query(
-          "INSERT INTO notifications (from_user_id, to_user_id, notif_message) VALUES($1, $2, $3)",
+          "INSERT INTO notifications (from_user_id, to_user_id, notif_type) VALUES($1, $2, $3)",
           [user.id, profileId, "profile check"]
         );
       } catch (error) {
@@ -1128,18 +1136,38 @@ module.exports = {
     },
 
     async getMatchedUsers(_, {}, context) {
+      const user = await checkAuth(context);
       try {
-        const user = await checkAuth(context);
-        const matched = await pool.query("", [user.id]);
+        const matched = await pool.query(
+          "SELECT from_user_id,to_user_id from matches WHERE from_user_id = $1 OR to_user_id =$1",
+          [user.id]
+        );
         console.log(user.id);
-        console.log(matched);
-        return [
+        const matchedUsers = [];
+        for (let users of matched.rows) {
+          if (users.to_user_id !== user.id) {
+            matchedUsers.push({ id: users.to_user_id });
+          }
+        }
+        for (let users of matched.rows) {
+          if (users.from_user_id !== user.id) {
+            matchedUsers.push({ id: users.from_user_id });
+          }
+        }
+        /* const matchedUnique = lodash.uniqBy(matched.rows, function (e) {
+          return e.to_user_id;
+        }); */
+
+        //console.log(user.id);
+        //console.log(matchedUnique);
+        /* return [
           {
-            id: "google",
+            id: "123456",
             username: "dummy",
-            profilePicture: "google.com",
+            profilePicture: "google.com/ProfilePicture",
           },
-        ];
+        ] */
+        return matchedUsers;
       } catch (error) {
         console.log(error);
       }
@@ -1160,7 +1188,7 @@ module.exports = {
 
         return {
           from: notif.rows[0].from_user_id,
-          message: notif.rows[0].notif_message,
+          message: notif.rows[0].notif_type,
         };
       },
     },

@@ -86,6 +86,12 @@ CREATE TABLE users
         created_at timestamp NOT NULL DEFAULT NOW()
     );
 
+    CREATE TABLE matches(
+        match_id INT GENERATED ALWAYS AS IDENTITY,
+        from_user_id VARCHAR(255) NOT NULL,
+        to_user_id VARCHAR(255) NOT NULL
+    );
+
     -- https://www.the-art-of-web.com/sql/trigger-delete-old/
     CREATE FUNCTION delete_old_rows() RETURNS trigger
     LANGUAGE plpgsql
