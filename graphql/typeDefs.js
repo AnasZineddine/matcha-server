@@ -125,6 +125,7 @@ module.exports = gql`
     addSexualPreference(sexualPreference: SexualPreference!): Boolean!
     addBiography(biography: String!): Boolean!
     uploadFile(file: Upload!, type: Type!): File!
+    deletePicture(url: String!, type: Type!): Boolean
     addAge(age: Int!): Boolean!
     addInterrests(interests: [InterestInput]): Boolean!
     addInterrest(interest: String!): Boolean!

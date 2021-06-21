@@ -439,6 +439,15 @@ module.exports = {
             [url, user.id]
           );
         } else if (type === "regular") {
+          const regularPictures = await pool.query(
+            "SELECT regular_pictures from users WHERE user_id = $1",
+            [user.id]
+          );
+          if (regularPictures.rows[0].regular_pictures.length >= 4) {
+            throw new UserInputError(
+              "You can t have more than 4 regulars pictures"
+            );
+          }
           await pool.query(
             "UPDATE users SET regular_pictures = array_append(regular_pictures, $1) WHERE user_id = $2",
             [url, user.id]
@@ -774,6 +783,35 @@ module.exports = {
           content: content,
           createdAt: message.rows[0].created_at,
         };
+      } catch (error) {
+        console.log(error);
+      }
+    },
+
+    async deletePicture(_, { url, type }, context) {
+      const user = await checkAuth(context);
+      try {
+        if (type === "profile") {
+          const profilePicture = await pool.query(
+            "SELECT profile_picture from users WHERE user_id = $1",
+            [user.id]
+          );
+          if (profilePicture.rows[0].profile_picture !== url) {
+            throw new UserInputError("Image not found !");
+          } else {
+            await pool.query(
+              "UPDATE users SET profile_picture = NULL WHERE user_id = $1",
+              [user.id]
+            );
+            return true;
+          }
+        } else if (type === "regular") {
+          const regularPictures = await pool.query(
+            "SELECT regular_pictures FROM users WHERE user_id = $1",
+            [user.id]
+          );
+          console.log(regularPictures.rows[0].regular_pictures);
+        }
       } catch (error) {
         console.log(error);
       }
