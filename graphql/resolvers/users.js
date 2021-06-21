@@ -789,6 +789,7 @@ module.exports = {
     },
 
     async deletePicture(_, { url, type }, context) {
+      //TODO: remove from fileSystem
       const user = await checkAuth(context);
       try {
         if (type === "profile") {
@@ -797,7 +798,7 @@ module.exports = {
             [user.id]
           );
           if (profilePicture.rows[0].profile_picture !== url) {
-            throw new UserInputError("Image not found !");
+            return false;
           } else {
             await pool.query(
               "UPDATE users SET profile_picture = NULL WHERE user_id = $1",
@@ -810,7 +811,20 @@ module.exports = {
             "SELECT regular_pictures FROM users WHERE user_id = $1",
             [user.id]
           );
-          console.log(regularPictures.rows[0].regular_pictures);
+          for (
+            let i = 0;
+            i < regularPictures.rows[0].regular_pictures.length;
+            i++
+          ) {
+            if (regularPictures.rows[0].regular_pictures[i] === url) {
+              await pool.query(
+                "UPDATE users SET regular_pictures = array_remove(regular_pictures , $1) WHERE user_id = $2",
+                [url, user.id]
+              );
+              return true;
+            }
+            return false;
+          }
         }
       } catch (error) {
         console.log(error);
