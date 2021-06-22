@@ -443,10 +443,12 @@ module.exports = {
             "SELECT regular_pictures from users WHERE user_id = $1",
             [user.id]
           );
-          if (regularPictures.rows[0].regular_pictures.length >= 4) {
-            throw new UserInputError(
-              "You can t have more than 4 regulars pictures"
-            );
+          if (regularPictures.rows[0].regular_pictures !== null) {
+            if (regularPictures.rows[0].regular_pictures.length === 4) {
+              throw new UserInputError(
+                "You can t have more than 4 regulars pictures"
+              );
+            }
           }
           await pool.query(
             "UPDATE users SET regular_pictures = array_append(regular_pictures, $1) WHERE user_id = $2",
@@ -1194,7 +1196,7 @@ module.exports = {
           "SELECT from_user_id,to_user_id from matches WHERE from_user_id = $1 OR to_user_id =$1",
           [user.id]
         );
-        console.log(user.id);
+        //console.log(user.id);
         const matchedUsers = [];
         for (let users of matched.rows) {
           if (users.to_user_id !== user.id) {
@@ -1205,6 +1207,20 @@ module.exports = {
           if (users.from_user_id !== user.id) {
             matchedUsers.push({ id: users.from_user_id });
           }
+        }
+        const matchedUsersDetails = [];
+        for (let userDetail of matchedUsers) {
+          /* matchedUsersDetails.push({
+            
+          }) */
+          userData = await pool.query(
+            "SELECT username,profile_picture from users WHERE user_id = $1",
+            [userDetail.id]
+          );
+          matchedUsersDetails.push({
+            username: userData.rows[0].username,
+            profilePicture: userData.rows[0].profile_picture,
+          });
         }
         /* const matchedUnique = lodash.uniqBy(matched.rows, function (e) {
           return e.to_user_id;
@@ -1219,7 +1235,7 @@ module.exports = {
             profilePicture: "google.com/ProfilePicture",
           },
         ] */
-        return matchedUsers;
+        return matchedUsersDetails;
       } catch (error) {
         console.log(error);
       }
