@@ -1214,10 +1214,11 @@ module.exports = {
             
           }) */
           userData = await pool.query(
-            "SELECT username,profile_picture from users WHERE user_id = $1",
+            "SELECT user_id,username,profile_picture from users WHERE user_id = $1",
             [userDetail.id]
           );
           matchedUsersDetails.push({
+            id: userData.rows[0].user_id,
             username: userData.rows[0].username,
             profilePicture: userData.rows[0].profile_picture,
           });
