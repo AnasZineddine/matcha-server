@@ -83,7 +83,9 @@ module.exports = gql`
   }
 
   type notification {
+    id: ID!
     from: String
+    to: String
     message: String
   }
 
@@ -139,6 +141,7 @@ module.exports = gql`
     refreshToken: User!
     resendConfirmationEmail(userEmail: String!): Boolean!
     sendMessage(to: String!, content: String!): Message!
+    markNotificationAsRead(notif_id: String!): Boolean
   }
 
   type Subscription {

@@ -609,19 +609,36 @@ module.exports = {
             "INSERT into likes (from_user_id, to_user_id) VALUES ($1, $2)",
             [user.id, userToLikeId]
           );
-          await pool.query(
-            "INSERT INTO notifications (from_user_id, to_user_id, notif_type) VALUES($1, $2, $3)",
+          const notif = await pool.query(
+            "INSERT INTO notifications (from_user_id, to_user_id, notif_type) VALUES($1, $2, $3) RETURNING *",
             [user.id, userToLikeId, "like"]
           );
+          context.pubsub.publish("NEW_NOTIFICATION", {
+            newNotification: {
+              id: notif.rows[0].notif_id,
+              from: user.id,
+              to: userToLikeId,
+              message: "like",
+            },
+          });
           const checkMatch = await pool.query(
             "SELECT like_id from likes WHERE from_user_id = $1 AND to_user_id = $2",
             [userToLikeId, user.id]
           );
           if (checkMatch.rowCount === 1) {
-            await pool.query(
-              "INSERT INTO notifications (from_user_id, to_user_id, notif_type) VALUES ($1, $2, $3)",
+            const notif = await pool.query(
+              "INSERT INTO notifications (from_user_id, to_user_id, notif_type) VALUES ($1, $2, $3) RETURNING *",
               [user.id, userToLikeId, "match"]
             );
+
+            context.pubsub.publish("NEW_NOTIFICATION", {
+              newNotification: {
+                id: notif.rows[0].notif_id,
+                from: user.id,
+                to: userToLikeId,
+                message: "match",
+              },
+            });
             await pool.query(
               "INSERT INTO matches (from_user_id, to_user_id) VALUES ($1, $2)",
               [user.id, userToLikeId]
@@ -667,10 +684,19 @@ module.exports = {
             [user.id, userToUnlikeId]
           );
           if (checkMatch.rowCount === 2) {
-            await pool.query(
-              "INSERT INTO notifications (from_user_id, to_user_id, notif_type) VALUES ($1, $2, $3)",
+            const notif = await pool.query(
+              "INSERT INTO notifications (from_user_id, to_user_id, notif_type) VALUES ($1, $2, $3) RETURNING *",
               [user.id, userToUnlikeId, "connected unlike"]
             );
+
+            context.pubsub.publish("NEW_NOTIFICATION", {
+              newNotification: {
+                id: notif.rows[0].notif_id,
+                from: user.id,
+                to: userToUnlikeId,
+                message: "connected user unliked you",
+              },
+            });
             await pool.query(
               "DELETE FROM matches WHERE (from_user_id = $1 AND to_user_id = $2) OR (from_user_id = $2 AND to_user_id = $1)",
               [user.id, userToUnlikeId]
@@ -778,6 +804,20 @@ module.exports = {
           },
         });
 
+        const notif = await pool.query(
+          "INSERT INTO notifications (from_user_id, to_user_id, notif_type) VALUES($1, $2, $3) RETURNING *",
+          [user.id, profileId, "New message"]
+        );
+
+        context.pubsub.publish("NEW_NOTIFICATION", {
+          newNotification: {
+            id: notif.rows[0].notif_id,
+            from: user.id,
+            to: to,
+            message: "New message",
+          },
+        });
+
         return {
           id: message.rows[0].message_id,
           from: user.id,
@@ -830,6 +870,20 @@ module.exports = {
         }
       } catch (error) {
         console.log(error);
+      }
+    },
+
+    async markNotificationAsRead(_, { notif_id }, context) {
+      const user = await checkAuth(context);
+      try {
+        await pool.query(
+          "UPDATE notifications SET is_read = 't' WHERE notif_id = $1 AND to_user_id= $2",
+          [notif_id, user.id]
+        );
+        return true;
+      } catch (error) {
+        console.log(error);
+        return false;
       }
     },
   },
@@ -1087,10 +1141,18 @@ module.exports = {
           "INSERT into profile_look (from_user_id, to_user_id) VALUES ($1, $2)",
           [user.id, profileId]
         );
-        await pool.query(
-          "INSERT INTO notifications (from_user_id, to_user_id, notif_type) VALUES($1, $2, $3)",
+        const notif = await pool.query(
+          "INSERT INTO notifications (from_user_id, to_user_id, notif_type) VALUES($1, $2, $3) RETURNING *",
           [user.id, profileId, "profile check"]
         );
+        context.pubsub.publish("NEW_NOTIFICATION", {
+          newNotification: {
+            id: notif.rows[0].notif_id,
+            from: user.id,
+            to: profileId,
+            message: "profile check",
+          },
+        });
       } catch (error) {
         console.log(error);
         return null; // TODO: check what to return
@@ -1246,19 +1308,18 @@ module.exports = {
   //},
   Subscription: {
     newNotification: {
-      subscribe: async (_, __, context) => {
-        // console.log(context);
-        // const user = await checkAuth(context);
-
-        const notif = await pool.query(
-          "SELECT * from notifications WHERE to_user_id = $1",
-          ["4aec7470-8cbd-41a4-9c17-7e7f31e12d62"]
-        );
-
-        return {
-          from: notif.rows[0].from_user_id,
-          message: notif.rows[0].notif_type,
-        };
+      async subscribe(rootValue, args, context) {
+        const user = await checkAuth(context);
+        return withFilter(
+          () => context.pubsub.asyncIterator(["NEW_NOTIFICATION"]),
+          async ({ newNotification }, _, context) => {
+            const user = await checkAuth(context);
+            if (newNotification.to === user.id) {
+              return true;
+            }
+            return false;
+          }
+        )(rootValue, args, context);
       },
     },
 
