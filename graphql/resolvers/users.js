@@ -1121,6 +1121,10 @@ module.exports = {
     //TODO: check complete profiles
     async checkProfile(_, { profileId }, context) {
       const user = await checkAuth(context);
+      const userData = await pool.query(
+        "SELECT user_lat, user_lon from users WHERE user_id = $1",
+        [user.id]
+      );
       const checkUser = await pool.query(
         "SELECT * from users WHERE user_id = $1",
         [profileId]
@@ -1161,6 +1165,9 @@ module.exports = {
         "(SELECT like_id from likes WHERE from_user_id = $1 AND to_user_id = $2) UNION (SELECT like_id from likes WHERE from_user_id = $3 AND to_user_id = $4)",
         [user.id, profileId, profileId, user.id]
       );
+      let user_lat = checkUser.rows[0].user_lat;
+      let user_lon = checkUser.rows[0].user_lon;
+
       return {
         profilePicture: checkUser.rows[0].profile_picture,
         regularPictures: checkUser.rows[0].regular_pictures,
@@ -1177,8 +1184,8 @@ module.exports = {
         connected: checkMatch.rowCount === 2 ? true : false,
         distance: Math.ceil(
           getDistanceFromLatLonInKm(
-            parseInt(checkUser.rows[0].user_lat, 10),
-            parseInt(checkUser.rows[0].user_lon, 10),
+            user_lat,
+            user_lon,
             user.user_lat,
             user.user_lon
           )
