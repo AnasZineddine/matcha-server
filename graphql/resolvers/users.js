@@ -1162,9 +1162,17 @@ module.exports = {
         [user.id, profileId, profileId, user.id]
       );
       return {
+        profilePicture: checkUser.rows[0].profile_picture,
+        regularPictures: checkUser.rows[0].regular_pictures,
         firstName: checkUser.rows[0].user_first_name,
         lastName: checkUser.rows[0].user_last_name,
         username: checkUser.rows[0].username,
+        gender: checkUser.rows[0].user_gender,
+        biography: checkUser.rows[0].user_biography,
+        score: checkUser.rows[0].user_score,
+        sexualPreference: checkUser.rows[0].user_sexual_preference,
+        birthday: checkUser.rows[0].user_birthday,
+        interests: checkUser.rows[0].user_interests,
         age: checkUser.rows[0].user_age,
         connected: checkMatch.rowCount === 2 ? true : false,
         //TODO:RETURN other infos of user
