@@ -1175,6 +1175,14 @@ module.exports = {
         interests: checkUser.rows[0].user_interests,
         age: checkUser.rows[0].user_age,
         connected: checkMatch.rowCount === 2 ? true : false,
+        distance: Math.ceil(
+          getDistanceFromLatLonInKm(
+            checkUser.rows[0].user_lat,
+            checkUser.rows[0].user_lon,
+            user.user_lat,
+            user.user_lon
+          )
+        ),
         //TODO:RETURN other infos of user
       };
     },
