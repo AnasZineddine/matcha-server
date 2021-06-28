@@ -1186,8 +1186,8 @@ module.exports = {
           getDistanceFromLatLonInKm(
             user_lat,
             user_lon,
-            user.user_lat,
-            user.user_lon
+            userData.rows[0].user_lat,
+            userData.rows[0].user_lon
           )
         ),
         //TODO:RETURN other infos of user
