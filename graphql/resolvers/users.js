@@ -1177,8 +1177,8 @@ module.exports = {
         connected: checkMatch.rowCount === 2 ? true : false,
         distance: Math.ceil(
           getDistanceFromLatLonInKm(
-            checkUser.rows[0].user_lat,
-            checkUser.rows[0].user_lon,
+            parseInt(checkUser.rows[0].user_lat, 10),
+            parseInt(checkUser.rows[0].user_lon, 10),
             user.user_lat,
             user.user_lon
           )
