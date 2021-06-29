@@ -636,7 +636,7 @@ module.exports = {
                 id: notif.rows[0].notif_id,
                 from: user.id,
                 to: userToLikeId,
-                message: "match",
+                message: `${user.username} liked you back`,
               },
             });
             await pool.query(
@@ -694,7 +694,7 @@ module.exports = {
                 id: notif.rows[0].notif_id,
                 from: user.id,
                 to: userToUnlikeId,
-                message: "connected user unliked you",
+                message: `${user.username} your match unliked you`,
               },
             });
             await pool.query(
@@ -814,7 +814,7 @@ module.exports = {
             id: notif.rows[0].notif_id,
             from: user.id,
             to: to,
-            message: "New message",
+            message: `${user.username} sent you a message`,
           },
         });
 
@@ -1122,7 +1122,7 @@ module.exports = {
     async checkProfile(_, { profileId }, context) {
       const user = await checkAuth(context);
       const userData = await pool.query(
-        "SELECT user_lat, user_lon from users WHERE user_id = $1",
+        "SELECT user_lat, user_lon, username from users WHERE user_id = $1",
         [user.id]
       );
       const checkUser = await pool.query(
@@ -1154,7 +1154,7 @@ module.exports = {
             id: notif.rows[0].notif_id,
             from: user.id,
             to: profileId,
-            message: "profile check",
+            message: `${userData.username} visited your profile`,
           },
         });
       } catch (error) {
