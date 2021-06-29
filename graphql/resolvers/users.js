@@ -611,14 +611,14 @@ module.exports = {
           );
           const notif = await pool.query(
             "INSERT INTO notifications (from_user_id, to_user_id, notif_type) VALUES($1, $2, $3) RETURNING *",
-            [user.id, userToLikeId, "like"]
+            [user.id, userToLikeId, `${user.username} liked you`]
           );
           context.pubsub.publish("NEW_NOTIFICATION", {
             newNotification: {
               id: notif.rows[0].notif_id,
               from: user.id,
               to: userToLikeId,
-              message: "like",
+              message: `${user.username} liked you`,
             },
           });
           const checkMatch = await pool.query(
@@ -628,7 +628,7 @@ module.exports = {
           if (checkMatch.rowCount === 1) {
             const notif = await pool.query(
               "INSERT INTO notifications (from_user_id, to_user_id, notif_type) VALUES ($1, $2, $3) RETURNING *",
-              [user.id, userToLikeId, "match"]
+              [user.id, userToLikeId, `${user.username} liked you back`]
             );
 
             context.pubsub.publish("NEW_NOTIFICATION", {
@@ -686,7 +686,11 @@ module.exports = {
           if (checkMatch.rowCount === 2) {
             const notif = await pool.query(
               "INSERT INTO notifications (from_user_id, to_user_id, notif_type) VALUES ($1, $2, $3) RETURNING *",
-              [user.id, userToUnlikeId, "connected unlike"]
+              [
+                user.id,
+                userToUnlikeId,
+                `your match ${user.username} unliked you`,
+              ]
             );
 
             context.pubsub.publish("NEW_NOTIFICATION", {
@@ -694,7 +698,7 @@ module.exports = {
                 id: notif.rows[0].notif_id,
                 from: user.id,
                 to: userToUnlikeId,
-                message: `${user.username} your match unliked you`,
+                message: `your match ${user.username} unliked you`,
               },
             });
             await pool.query(
@@ -806,7 +810,7 @@ module.exports = {
 
         const notif = await pool.query(
           "INSERT INTO notifications (from_user_id, to_user_id, notif_type) VALUES($1, $2, $3) RETURNING *",
-          [user.id, to, "New message"]
+          [user.id, to, `${user.username} sent you a message`]
         );
 
         context.pubsub.publish("NEW_NOTIFICATION", {
@@ -873,12 +877,12 @@ module.exports = {
       }
     },
 
-    async markNotificationAsRead(_, { notif_id }, context) {
+    async readNotifications(_, {}, context) {
       const user = await checkAuth(context);
       try {
         await pool.query(
-          "UPDATE notifications SET is_read = 't' WHERE notif_id = $1 AND to_user_id= $2",
-          [notif_id, user.id]
+          "UPDATE notifications SET is_read = 't' WHERE to_user_id= $1",
+          [user.id]
         );
         return true;
       } catch (error) {
@@ -1147,7 +1151,7 @@ module.exports = {
         );
         const notif = await pool.query(
           "INSERT INTO notifications (from_user_id, to_user_id, notif_type) VALUES($1, $2, $3) RETURNING *",
-          [user.id, profileId, "profile check"]
+          [user.id, profileId, `${user.username} visited your profile`]
         );
         context.pubsub.publish("NEW_NOTIFICATION", {
           newNotification: {
@@ -1164,6 +1168,10 @@ module.exports = {
       const checkMatch = await pool.query(
         "(SELECT like_id from likes WHERE from_user_id = $1 AND to_user_id = $2) UNION (SELECT like_id from likes WHERE from_user_id = $3 AND to_user_id = $4)",
         [user.id, profileId, profileId, user.id]
+      );
+      const checkLike = await pool.query(
+        "SELECT like_id from likes WHERE from_user_id = $1 AND to_user_id = $2",
+        [user.id, profileId]
       );
       let user_lat = checkUser.rows[0].user_lat;
       let user_lon = checkUser.rows[0].user_lon;
@@ -1182,6 +1190,7 @@ module.exports = {
         interests: checkUser.rows[0].user_interests,
         age: checkUser.rows[0].user_age,
         connected: checkMatch.rowCount === 2 ? true : false,
+        liked: checkLike.rowCount !== 0 ? true : false,
         distance: Math.ceil(
           getDistanceFromLatLonInKm(
             user_lat,
@@ -1326,6 +1335,24 @@ module.exports = {
         console.log(error);
       }
     },
+
+    async getNotifications(_, {}, context) {
+      const user = await checkAuth(context);
+      try {
+        const userNotificatons = await pool.query(
+          "SELECT * from notifications WHERE to_user_id = $1 AND is_read='f'",
+          [user.id]
+        );
+        const notifArray = [];
+
+        for (let notif of userNotificatons.rows) {
+          notifArray.push({ message: notif.notif_type });
+        }
+        return notifArray;
+      } catch (error) {
+        console.log(error);
+      }
+    },
   },
 
   //},
@@ -1363,3 +1390,4 @@ module.exports = {
     },
   },
 };
+//63333

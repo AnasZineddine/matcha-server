@@ -21,6 +21,7 @@ module.exports = gql`
     birthday: String
     interests: [String]
     connected: Boolean
+    liked: Boolean
     lat: Float
     lon: Float
     profilePicture: String
@@ -110,6 +111,7 @@ module.exports = gql`
     checkIfComplete: Boolean
     getMessages(from: String!): [Message]!
     getMatchedUsers: [User]!
+    getNotifications: [notification]!
   }
 
   type Mutation {
@@ -141,7 +143,7 @@ module.exports = gql`
     refreshToken: User!
     resendConfirmationEmail(userEmail: String!): Boolean!
     sendMessage(to: String!, content: String!): Message!
-    markNotificationAsRead(notif_id: String!): Boolean
+    readNotifications: Boolean
   }
 
   type Subscription {
