@@ -1154,7 +1154,7 @@ module.exports = {
             id: notif.rows[0].notif_id,
             from: user.id,
             to: profileId,
-            message: `${userData.username} visited your profile`,
+            message: `${user.username} visited your profile`,
           },
         });
       } catch (error) {
