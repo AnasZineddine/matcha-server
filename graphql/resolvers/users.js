@@ -939,6 +939,20 @@ module.exports = {
         );
       }
 
+      const blockedUsers = await pool.query(
+        "SELECT to_user_id FROM blocks WHERE from_user_id = $1",
+        [user.id]
+      );
+
+      for (let user of blockedUsers.rows) {
+        sameSexualPreference.rows.splice(
+          sameSexualPreference.rows.findIndex(function (i) {
+            return i.user_id === user.to_user_id;
+          }),
+          1
+        );
+      }
+
       let user_lat = userData.rows[0].user_lat;
       let user_lon = userData.rows[0].user_lon;
 
