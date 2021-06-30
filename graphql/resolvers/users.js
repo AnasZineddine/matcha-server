@@ -723,11 +723,10 @@ module.exports = {
           [user.id]
         );
         await pool.query("INSERT INTO black_list (token) VALUES ($1)", [token]);
-        console.log(context.req.headers.cookie.split("=")[1]);
         context.req.res.cookie("refresh_token", {
           max: 0,
+          overwrite: true,
         });
-        console.log(context.req.headers.cookie);
         return true;
       } catch (error) {
         console.log(error);
