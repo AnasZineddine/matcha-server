@@ -29,7 +29,6 @@
     "nodemailer": "^6.5.0",
     "nodemailer-sendgrid": "^1.0.3",
     "pg": "^8.5.1",
-    "underscore": "^1.13.1",
     "xmlhttprequest": "^1.8.0"
   },
   "resolutions": {

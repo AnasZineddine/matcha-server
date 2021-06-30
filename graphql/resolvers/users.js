@@ -723,6 +723,11 @@ module.exports = {
           [user.id]
         );
         await pool.query("INSERT INTO black_list (token) VALUES ($1)", [token]);
+        console.log(context.req.headers.cookie.split("=")[1]);
+        context.req.res.cookie("refresh_token", {
+          max: 0,
+        });
+        console.log(context.req.headers.cookie);
         return true;
       } catch (error) {
         console.log(error);
@@ -1325,6 +1330,7 @@ module.exports = {
             1
           );
         }
+
         const matchedUsers = [];
         for (let users of matched.rows) {
           if (users.to_user_id !== user.id) {
