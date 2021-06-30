@@ -1304,7 +1304,27 @@ module.exports = {
           "SELECT from_user_id,to_user_id from matches WHERE from_user_id = $1 OR to_user_id =$1",
           [user.id]
         );
-        //console.log(user.id);
+        const blockedUsers = await pool.query(
+          "SELECT to_user_id FROM blocks WHERE from_user_id = $1",
+          [user.id]
+        );
+
+        for (let user of blockedUsers.rows) {
+          matched.rows.splice(
+            matched.rows.findIndex(function (i) {
+              return i.from_user_id === user.to_user_id;
+            }),
+            1
+          );
+        }
+        for (let user of blockedUsers.rows) {
+          matched.rows.splice(
+            matched.rows.findIndex(function (i) {
+              return i.to_user_id === user.to_user_id;
+            }),
+            1
+          );
+        }
         const matchedUsers = [];
         for (let users of matched.rows) {
           if (users.to_user_id !== user.id) {
