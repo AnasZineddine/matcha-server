@@ -873,8 +873,8 @@ module.exports = {
               );
               return true;
             }
-            return false;
           }
+          return false;
         }
       } catch (error) {
         console.log(error);
