@@ -519,7 +519,6 @@ module.exports = {
     //https://ip-api.com/docs/api:json
     async forceGeolocation(_, {}, context) {
       const user = await checkAuth(context);
-      console(context.req.connection.remoteAddress);
       var endpoint =
         "http://ip-api.com/json/?fields=status,message,lat,lon,city";
       var xhr = new XMLHttpRequest();
