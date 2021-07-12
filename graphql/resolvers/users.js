@@ -580,6 +580,10 @@ module.exports = {
           "DELETE from matches WHERE (from_user_id = $1 AND to_user_id = $2) OR (from_user_id = $2 AND to_user_id = $1)",
           [user.id, userToBlockId]
         );
+        await pool.query(
+          "DELETE from likes WHERE (from_user_id = $1 AND to_user_id = $2) OR (from_user_id = $2 AND to_user_id = $1)",
+          [user.id, userToBlockId]
+        );
       }
       return true;
     },
