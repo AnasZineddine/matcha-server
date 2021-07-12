@@ -576,6 +576,10 @@ module.exports = {
           "INSERT into blocks (from_user_id, to_user_id) VALUES ($1, $2)",
           [user.id, userToBlockId]
         );
+        await pool.query(
+          "DELETE from matches WHERE (from_user_id = $1 AND to_user_id = $2) OR (from_user_id = $2 AND to_user_id = $1)",
+          [user.id, userToBlockId]
+        );
       }
       return true;
     },
@@ -1307,7 +1311,7 @@ module.exports = {
           "SELECT from_user_id,to_user_id from matches WHERE from_user_id = $1 OR to_user_id =$1",
           [user.id]
         );
-        const blockedUsers = await pool.query(
+        /* const blockedUsers = await pool.query(
           "SELECT to_user_id FROM blocks WHERE from_user_id = $1",
           [user.id]
         );
@@ -1327,7 +1331,7 @@ module.exports = {
             }),
             1
           );
-        }
+        } */
 
         const matchedUsers = [];
         for (let users of matched.rows) {

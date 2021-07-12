@@ -103,7 +103,7 @@ module.exports = gql`
     createdAt: String!
   }
 
-  type Query @rateLimit(limit: 20, duration: 15) {
+  type Query @rateLimit(limit: 100, duration: 15) {
     uploads: [File]
     browseUsers(orderBy: OrderByInput, filterBy: FilterByInput): [User]
     checkProfile(profileId: ID): User
@@ -114,9 +114,9 @@ module.exports = gql`
     getNotifications: [notification]!
   }
 
-  type Mutation @rateLimit(limit: 20, duration: 15) {
+  type Mutation @rateLimit(limit: 100, duration: 15) {
     register(registerInput: RegisterInput): User!
-      @rateLimit(limit: 3, duration: 3600)
+      @rateLimit(limit: 5, duration: 3600)
     login(username: String!, password: String!): User!
     confirmEmail(token: String!): Boolean!
     recoverPassword(email: String!): User!
