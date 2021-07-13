@@ -616,6 +616,7 @@ module.exports = {
             "INSERT into likes (from_user_id, to_user_id) VALUES ($1, $2)",
             [user.id, userToLikeId]
           );
+          await pool.query("UPDATE users SET user_score = user_score + 3 WHERE user_id = $1", [userToLikeId]);
           const notif = await pool.query(
             "INSERT INTO notifications (from_user_id, to_user_id, notif_type) VALUES($1, $2, $3) RETURNING *",
             [user.id, userToLikeId, `${user.username} liked you`]
@@ -690,6 +691,7 @@ module.exports = {
             "DELETE FROM likes WHERE from_user_id = $1 AND to_user_id = $2",
             [user.id, userToUnlikeId]
           );
+          await pool.query("UPDATE users SET user_score = user_score - 3 WHERE user_id = $1", [userToUnlikeId]);
           if (checkMatch.rowCount === 2) {
             const notif = await pool.query(
               "INSERT INTO notifications (from_user_id, to_user_id, notif_type) VALUES ($1, $2, $3) RETURNING *",
@@ -1174,6 +1176,7 @@ module.exports = {
           "INSERT into profile_look (from_user_id, to_user_id) VALUES ($1, $2)",
           [user.id, profileId]
         );
+        await pool.query("UPDATE users SET user_score = user_score + 1 WHERE user_id = $1", [profileId]);
         const notif = await pool.query(
           "INSERT INTO notifications (from_user_id, to_user_id, notif_type) VALUES($1, $2, $3) RETURNING *",
           [user.id, profileId, `${user.username} visited your profile`]
@@ -1209,7 +1212,7 @@ module.exports = {
         username: checkUser.rows[0].username,
         gender: checkUser.rows[0].user_gender,
         biography: checkUser.rows[0].user_biography,
-        score: checkUser.rows[0].user_score,
+        score: checkUser.rows[0].user_score / 10,
         sexualPreference: checkUser.rows[0].user_sexual_preference,
         birthday: checkUser.rows[0].user_birthday,
         interests: checkUser.rows[0].user_interests,
@@ -1243,7 +1246,7 @@ module.exports = {
           birthday: userData.rows[0].user_birthday,
           sexualPreference: userData.rows[0].user_sexual_preference,
           biography: userData.rows[0].user_biography,
-          score: userData.rows[0].user_score,
+          score: userData.rows[0].user_score / 10,
           gender: userData.rows[0].user_gender,
           interests: userData.rows[0].user_interests,
           lat: userData.rows[0].user_lat,
