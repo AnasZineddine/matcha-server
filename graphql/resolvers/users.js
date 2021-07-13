@@ -1212,7 +1212,7 @@ module.exports = {
         username: checkUser.rows[0].username,
         gender: checkUser.rows[0].user_gender,
         biography: checkUser.rows[0].user_biography,
-        score: checkUser.rows[0].user_score / 10,
+        score: checkUser.rows[0].user_score,
         sexualPreference: checkUser.rows[0].user_sexual_preference,
         birthday: checkUser.rows[0].user_birthday,
         interests: checkUser.rows[0].user_interests,
