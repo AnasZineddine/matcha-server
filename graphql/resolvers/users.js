@@ -734,7 +734,7 @@ module.exports = {
       const token = context.req.headers.authorization.split("Bearer ")[1];
       try {
         await pool.query(
-          "UPDATE users SET user_last_connected = current_timestamp WHERE user_id = $1",
+          "UPDATE users SET user_last_connected = current_timestamp + (60 * interval '1 minute') WHERE user_id = $1",
           [user.id]
         );
         await pool.query("INSERT INTO black_list (token) VALUES ($1)", [token]);
@@ -914,7 +914,7 @@ module.exports = {
       const user = await checkAuth(context);
       try {
         await pool.query(
-          "UPDATE users SET user_last_connected = current_timestamp WHERE user_id = $1",
+          "UPDATE users SET user_last_connected = current_timestamp + (60 * interval '1 minute') WHERE user_id = $1",
           [user.id]
         );
         return true;
