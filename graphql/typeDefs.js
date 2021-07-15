@@ -10,6 +10,7 @@ module.exports = gql`
     firstName: String
     lastName: String
     username: String
+    lastSeen: String
     email: String
     token: String
     distance: Int
@@ -145,6 +146,7 @@ module.exports = gql`
     resendConfirmationEmail(userEmail: String!): Boolean!
     sendMessage(to: String!, content: String!): Message!
     readNotifications: Boolean
+    updateLastSeen: Boolean!
   }
 
   type Subscription {

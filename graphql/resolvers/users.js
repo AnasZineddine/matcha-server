@@ -616,7 +616,10 @@ module.exports = {
             "INSERT into likes (from_user_id, to_user_id) VALUES ($1, $2)",
             [user.id, userToLikeId]
           );
-          await pool.query("UPDATE users SET user_score = user_score + 3 WHERE user_id = $1", [userToLikeId]);
+          await pool.query(
+            "UPDATE users SET user_score = user_score + 3 WHERE user_id = $1",
+            [userToLikeId]
+          );
           const notif = await pool.query(
             "INSERT INTO notifications (from_user_id, to_user_id, notif_type) VALUES($1, $2, $3) RETURNING *",
             [user.id, userToLikeId, `${user.username} liked you`]
@@ -691,7 +694,10 @@ module.exports = {
             "DELETE FROM likes WHERE from_user_id = $1 AND to_user_id = $2",
             [user.id, userToUnlikeId]
           );
-          await pool.query("UPDATE users SET user_score = user_score - 3 WHERE user_id = $1", [userToUnlikeId]);
+          await pool.query(
+            "UPDATE users SET user_score = user_score - 3 WHERE user_id = $1",
+            [userToUnlikeId]
+          );
           if (checkMatch.rowCount === 2) {
             const notif = await pool.query(
               "INSERT INTO notifications (from_user_id, to_user_id, notif_type) VALUES ($1, $2, $3) RETURNING *",
@@ -895,6 +901,20 @@ module.exports = {
       try {
         await pool.query(
           "UPDATE notifications SET is_read = 't' WHERE to_user_id= $1",
+          [user.id]
+        );
+        return true;
+      } catch (error) {
+        console.log(error);
+        return false;
+      }
+    },
+
+    async updateLastSeen(_, __, context) {
+      const user = await checkAuth(context);
+      try {
+        await pool.query(
+          "UPDATE users SET user_last_connected = current_timestamp WHERE user_id = $1",
           [user.id]
         );
         return true;
@@ -1176,7 +1196,10 @@ module.exports = {
           "INSERT into profile_look (from_user_id, to_user_id) VALUES ($1, $2)",
           [user.id, profileId]
         );
-        await pool.query("UPDATE users SET user_score = user_score + 1 WHERE user_id = $1", [profileId]);
+        await pool.query(
+          "UPDATE users SET user_score = user_score + 1 WHERE user_id = $1",
+          [profileId]
+        );
         const notif = await pool.query(
           "INSERT INTO notifications (from_user_id, to_user_id, notif_type) VALUES($1, $2, $3) RETURNING *",
           [user.id, profileId, `${user.username} visited your profile`]
@@ -1219,6 +1242,7 @@ module.exports = {
         age: checkUser.rows[0].user_age,
         connected: checkMatch.rowCount === 2 ? true : false,
         liked: checkLike.rowCount !== 0 ? true : false,
+        lastSeen: checkUser.rows[0].user_last_connected,
         distance: Math.ceil(
           getDistanceFromLatLonInKm(
             user_lat,
