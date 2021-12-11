@@ -913,10 +913,11 @@ module.exports = {
     async updateLastSeen(_, __, context) {
       const user = await checkAuth(context);
       try {
-        await pool.query(
+        const lastSeen = await pool.query(
           "UPDATE users SET user_last_connected = current_timestamp + (60 * interval '1 minute') WHERE user_id = $1",
           [user.id]
         );
+        console.log({ lastSeen });
         return true;
       } catch (error) {
         console.log(error);
