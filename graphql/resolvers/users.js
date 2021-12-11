@@ -913,11 +913,16 @@ module.exports = {
     async updateLastSeen(_, __, context) {
       const user = await checkAuth(context);
       try {
-        const lastSeen = await pool.query(
-          "UPDATE users SET user_last_connected = current_timestamp + (60 * interval '1 minute') WHERE user_id = $1 RETURNING user",
+        const usermodified = await pool.query(
+          "UPDATE users SET user_last_connected = current_timestamp + (60 * interval '1 minute') WHERE user_id = $1 RETURNING user_last_connected",
           [user.id]
         );
-        console.log(lastSeen);
+        context.pubsub.publish("NEW_LASTSEEN", {
+          newLastSeen: {
+            id: user.id,
+            last_seen: usermodified.rows[0].user_last_connected,
+          },
+        });
         return true;
       } catch (error) {
         console.log(error);
@@ -1455,6 +1460,22 @@ module.exports = {
           async ({ newMessage }, _, context) => {
             const user = await checkAuth(context);
             if (newMessage.from === user.id || newMessage.to === user.id) {
+              return true;
+            }
+            return false;
+          }
+        )(rootValue, args, context);
+      },
+    },
+
+    newLastSeen: {
+      async subscribe(rootValue, args, context) {
+        const user = await checkAuth(context);
+        return withFilter(
+          () => context.pubsub.asyncIterator(["NEW_LASTSEEN"]),
+          async ({ newLastSeen }, _, context) => {
+            const user = await checkAuth(context);
+            if (newLastSeen.id !== user.id) {
               return true;
             }
             return false;

@@ -91,6 +91,11 @@ module.exports = gql`
     message: String
   }
 
+  type lastseen {
+    id: ID!
+    last_seen: String
+  }
+
   enum Type {
     profile
     regular
@@ -152,5 +157,6 @@ module.exports = gql`
   type Subscription {
     newNotification: notification
     newMessage: Message
+    newLastSeen: lastseen
   }
 `;
