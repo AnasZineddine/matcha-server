@@ -920,7 +920,7 @@ module.exports = {
         context.pubsub.publish("NEW_LASTSEEN", {
           newLastSeen: {
             id: user.id,
-            last_seen: usermodified.rows[0].user_last_connected.toISOString(),
+            last_seen: usermodified.rows[0].user_last_connected,
           },
         });
         return true;
