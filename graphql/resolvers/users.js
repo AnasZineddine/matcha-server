@@ -1248,7 +1248,7 @@ module.exports = {
         age: checkUser.rows[0].user_age,
         connected: checkMatch.rowCount === 2 ? true : false,
         liked: checkLike.rowCount !== 0 ? true : false,
-        lastSeen: checkUser.rows[0].user_last_connected,
+        lastSeen: checkUser.rows[0].user_last_connected.toISOString(),
         distance: Math.ceil(
           getDistanceFromLatLonInKm(
             user_lat,
