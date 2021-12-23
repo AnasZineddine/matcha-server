@@ -1257,7 +1257,7 @@ module.exports = {
             userData.rows[0].user_lon
           )
         ),
-        id: checkUser.rows[0].id,
+        id: checkUser.rows[0].user_id,
         //TODO:RETURN other infos of user
       };
     },
