@@ -13,6 +13,7 @@ const pool = require("../../db");
 const {
   validateRegisterInput,
   validateLoginInput,
+  validatePassword,
 } = require("../../util/validators");
 const {
   sendConfirmationEmail,
@@ -177,8 +178,6 @@ module.exports = {
       }
     },
     async recoverPassword(_, { email }) {
-      //TODO:check email is valid ??
-
       const user = await pool.query(
         "SELECT * FROM users WHERE user_email = $1",
         [email]
@@ -206,21 +205,25 @@ module.exports = {
       //console.log(user.rows[0].user_email);
       return { email };
     },
+
     async resetPassword(
       _,
       { resetInput: { password, resetToken } },
       context,
       info
     ) {
-      //TODO: validate input agaaaaaaaain and throw Userinputerror of apollo
+      const { errors, valid } = validatePassword(password);
+      if (!valid) {
+        throw new UserInputError("Errors", { errors });
+      }
       const user = await pool.query(
         "SELECT * FROM users WHERE reset_password_token = $1",
         [resetToken]
       );
       if (
         user.rows.length === 0 ||
-        user.rows[0].reset_password_token !==
-          resetToken /* || TODO: check expiracy date here ??*/
+        user.rows[0].reset_password_token !== resetToken
+        /* || TODO: check expiracy date here ??*/
       ) {
         //errors.general =
         //"Your password reset token is either invalid or expired.";
@@ -230,12 +233,12 @@ module.exports = {
       }
       const newBcryptPassword = await bcrypt.hash(password, 12);
       const user_email = await pool.query(
-        "UPDATE users SET user_password = $1 WHERE reset_password_token = $2 RETURNING *",
+        "UPDATE users SET user_password = $1, reset_password_token = 0, reset_password_expiry = 0 WHERE reset_password_token = $2 RETURNING *",
         [newBcryptPassword, resetToken]
       );
+
       // Send email of notif change email ??
       return { email: user.rows[0].user_email }; // not sure yet what to return to client...
-      //TODO: check again all of this
     },
 
     async addGender(_, { gender }, context, info) {
@@ -341,8 +344,6 @@ module.exports = {
         console.log(error);
         return false;
       }
-      //TODO:send confirmation email ??
-      // TODO:logout user and login again..token.. ??
     },
 
     async modifyPosition(_, { lat, lon }, context) {
@@ -397,7 +398,6 @@ module.exports = {
       } else if (age < 18) {
         throw new UserInputError("Not authorized for this plateform");
       }
-      //TODO: put limit on max age ??
       try {
         await pool.query("UPDATE users SET user_age = $1 WHERE user_id = $2", [
           age,
@@ -413,11 +413,13 @@ module.exports = {
     //ref : https://www.youtube.com/watch?v=BcZ_ItGplfE&ab_channel=Classsed
     async uploadFile(parent, { file, type }, context) {
       try {
+        //TODO: secure upload
         const user = await checkAuth(context);
         const { createReadStream, filename, mimetype, encoding } = await file;
         const { ext } = path.parse(filename);
         const randomName = generateRandomString(50) + ext;
         const stream = await createReadStream();
+        console.log({ mimetype, ext });
         if (
           !fs.existsSync(path.join(__dirname, `/public/images/${user.id}/`))
         ) {
@@ -427,6 +429,7 @@ module.exports = {
           __dirname,
           `/public/images/${user.id}/${randomName}`
         );
+
         /* await stream.pipe(fs.createWriteStream(pathName)); */
         await new Promise((resolve, reject) => {
           const writeStream = fs.createWriteStream(pathName);
@@ -462,7 +465,7 @@ module.exports = {
         console.log(error);
       }
     },
-    //TODO:regex for interests : ^#[A-Za-z]+$ && lenght
+
     async addInterrests(_, { interests }, context, info) {
       const user = await checkAuth(context);
       const obj = JSON.parse(JSON.stringify(interests));
@@ -489,9 +492,7 @@ module.exports = {
       if (!/^[A-Za-z]+$/.test(interest) || interest.length > 50) {
         throw new UserInputError("Invalid interest");
       }
-      //TODO:regex for interests : ^#[A-Za-z]+$ && lenght
       try {
-        //TODO:valide interest input
         await pool.query(
           "UPDATE users SET user_interests = array_append(user_interests, $1) WHERE user_id = $2",
           [interest, user.id]
@@ -854,8 +855,8 @@ module.exports = {
     },
 
     async deletePicture(_, { url, type }, context) {
-      //TODO: remove from fileSystem
       const user = await checkAuth(context);
+      const pathName = path.join(__dirname, `/public${url}`);
       try {
         if (type === "profile") {
           const profilePicture = await pool.query(
@@ -869,6 +870,7 @@ module.exports = {
               "UPDATE users SET profile_picture = NULL WHERE user_id = $1",
               [user.id]
             );
+            fs.unlinkSync(pathName);
             return true;
           }
         } else if (type === "regular") {
@@ -886,6 +888,7 @@ module.exports = {
                 "UPDATE users SET regular_pictures = array_remove(regular_pictures , $1) WHERE user_id = $2",
                 [url, user.id]
               );
+              fs.unlinkSync(pathName);
               return true;
             }
           }
@@ -947,7 +950,6 @@ module.exports = {
         userData.rows[0].user_sexual_preference === "Homosexual" &&
         userData.rows[0].user_gender === "Male"
       ) {
-        //TODO: MATCH gender && check for empty arrays && only completed profiles
         sameSexualPreference = await pool.query(
           "SELECT * from users WHERE user_sexual_preference = $1 AND user_gender = 'Male' AND is_complete='t' AND user_id != $2",
           [userData.rows[0].user_sexual_preference, user.id]
@@ -996,7 +998,6 @@ module.exports = {
       let user_lon = userData.rows[0].user_lon;
 
       let browseSuggestions = [];
-      //TODO:Push relevant data to array like username distance photo of user...
       for (let user of sameSexualPreference.rows) {
         browseSuggestions.push({
           firstName: user.user_first_name,
@@ -1025,7 +1026,7 @@ module.exports = {
         return (
           a.distance - b.distance ||
           b.interestsInCommon - a.interestsInCommon ||
-          b.userScore - a.userScore
+          b.score - a.score
         ); // TODO:CHECK if this is true
       });
       //testing arguments for search
@@ -1171,11 +1172,9 @@ module.exports = {
       }
 
       console.table(browseSuggestions);
-      //TODO: return relevant info
       return browseSuggestions;
     },
 
-    //TODO: check complete profiles
     async checkProfile(_, { profileId }, context) {
       const user = await checkAuth(context);
       const userData = await pool.query(
@@ -1197,7 +1196,6 @@ module.exports = {
         throw new Error("Can't see the profile of this user");
       }
       try {
-        //TODO:IGNORE DUPLICATE IN QUERY
         await pool.query(
           "INSERT into profile_look (from_user_id, to_user_id) VALUES ($1, $2)",
           [user.id, profileId]
@@ -1258,7 +1256,6 @@ module.exports = {
           )
         ),
         id: checkUser.rows[0].user_id,
-        //TODO:RETURN other infos of user
       };
     },
     async getUser(_, {}, context) {
@@ -1298,7 +1295,6 @@ module.exports = {
           [user.id]
         );
         //console.log(userData);
-        //TODO: check the veracity of below statement
         if (lodash.some(userData.rows[0], lodash.isEmpty)) {
           return false;
         } else {
