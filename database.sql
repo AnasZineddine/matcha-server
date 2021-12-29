@@ -10,6 +10,39 @@ CREATE TYPE gender AS ENUM
 Create TYPE sexual_preference AS ENUM
 ('Heterosexual', 'Bisexual', 'Homosexual');
 
+
+/*
+    INSERT INTO users ( 
+     user_first_name,
+    user_last_name,
+    username,
+    user_email,
+    user_password,
+    is_verified,
+    is_complete,
+    user_gender,
+    user_sexual_preference,
+    user_biography,
+    user_age,
+    user_interests,
+    user_last_connected
+    ) SELECT
+    'firstName' || round(random()*1000), -- for text
+    'lastName' || round(random()*1000), -- for text
+    'username' || round(random()*1000), -- for text
+    'user@user.com', -- for text
+    '$2a$12$8oiPfd4Y30XOakOiTaOLqe5TsEsUeeIZyfeCgRZ9ctK9WUSBtYsyq',
+    't',
+    't',
+    'Male',
+    'Bisexual',
+    'Lorem Ipsum',
+    round(random()*70),
+    '{movies, poker, code}',
+     now() + round(random()*1000) * '1 second'::interval
+    FROM generate_series(1,500);
+    */
+
 CREATE TABLE users
 (
     user_id uuid PRIMARY KEY DEFAULT
@@ -23,7 +56,7 @@ CREATE TABLE users
     is_complete BOOLEAN NOT NULL DEFAULT FALSE,
     reset_password_token VARCHAR(255) NOT NULL DEFAULT 0,--??????
     reset_password_expiry VARCHAR(255),
-    user_birthday VARCHAR(255) NOT NULL,
+    user_birthday VARCHAR(255) NOT NULL DEFAULT 0,
     user_gender gender,
     user_sexual_preference sexual_preference DEFAULT 'Bisexual',
     user_biography VARCHAR(600),
@@ -38,8 +71,6 @@ CREATE TABLE users
     user_city VARCHAR
     (255) NOT NULL DEFAULT 0,
     user_score smallint DEFAULT 0
-    -- user_biography VARCHAR(255) NOT NULL
-    -- ????????
     );
 
     CREATE TABLE likes (
@@ -92,7 +123,7 @@ CREATE TABLE users
         to_user_id VARCHAR(255) NOT NULL
     );
 
-    -- https://www.the-art-of-web.com/sql/trigger-delete-old/
+   
     CREATE FUNCTION delete_old_rows() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
@@ -114,4 +145,7 @@ $$;
         report_id INT GENERATED ALWAYS AS IDENTITY,
         from_user_id VARCHAR(255) NOT NULL,
         to_user_id VARCHAR (255) NOT NULL,
-    timestamp timestamp NOT NULL DEFAULT NOW);
+        timestamp timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+    );
+
+    
