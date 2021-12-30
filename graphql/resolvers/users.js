@@ -941,9 +941,26 @@ module.exports = {
         [user.id]
       );
       let sameSexualPreference;
-      if (userData.rows[0].user_sexual_preference === "Bisexual") {
+      // bisexual female => bi [male - female], homo female, hetero male
+      // bisexual male => bi [male - female], homo male, hetero female
+      // homo male => bi male, homo male
+      // homo female => bi female, homo female
+      // hetero male => hetero female, bi female
+      // hetero female => hetero male, bi male
+      if (
+        userData.rows[0].user_sexual_preference === "Bisexual" &&
+        userData.rows[0].user_gender === "Male"
+      ) {
         sameSexualPreference = await pool.query(
-          "SELECT * from users WHERE user_id != $1 AND is_complete ='t' AND user_sexual_preference = 'Bisexual'",
+          "SELECT * from users WHERE user_id != $1 AND is_complete ='t' AND ((user_sexual_preference = 'Bisexual') OR (user_sexual_preference = 'Homosexual' AND user_gender = 'Male') OR (user_sexual_preference = 'Heterosexual' AND user_gender = 'Female'))",
+          [user.id]
+        );
+      } else if (
+        userData.rows[0].user_sexual_preference === "Bisexual" &&
+        userData.rows[0].user_gender === "Female"
+      ) {
+        sameSexualPreference = await pool.query(
+          "SELECT * from users WHERE user_id != $1 AND is_complete ='t' AND ((user_sexual_preference = 'Bisexual') OR (user_sexual_preference = 'Homosexual' AND user_gender = 'Female') OR (user_sexual_preference = 'Heterosexual' AND user_gender = 'Male'))",
           [user.id]
         );
       } else if (
@@ -951,7 +968,7 @@ module.exports = {
         userData.rows[0].user_gender === "Male"
       ) {
         sameSexualPreference = await pool.query(
-          "SELECT * from users WHERE user_sexual_preference = $1 AND user_gender = 'Male' AND is_complete='t' AND user_id != $2",
+          "SELECT * from users WHERE is_complete='t' AND user_id != $2 AND ((user_sexual_preference = 'Bisexual' AND user_gender = 'Male') OR (user_sexual_preference = $1 AND user_gender = 'Male'))",
           [userData.rows[0].user_sexual_preference, user.id]
         );
       } else if (
@@ -959,7 +976,7 @@ module.exports = {
         userData.rows[0].user_gender === "Female"
       ) {
         sameSexualPreference = await pool.query(
-          "SELECT * from users WHERE user_sexual_preference = $1 AND user_gender = 'Female' AND user_id != $2 AND is_complete='t'",
+          "SELECT * from users WHERE is_complete='t' AND user_id != $2 AND ((user_sexual_preference = 'Bisexual' AND user_gender = 'Female') OR (user_sexual_preference = $1 AND user_gender = 'Female'))",
           [userData.rows[0].user_sexual_preference, user.id]
         );
       } else if (
@@ -967,15 +984,15 @@ module.exports = {
         userData.rows[0].user_gender === "Male"
       ) {
         sameSexualPreference = await pool.query(
-          "SELECT * from users WHERE user_sexual_preference = $1 AND user_gender = 'Female' AND user_id != $2 AND is_complete='t'",
+          "SELECT * from users WHERE is_complete='t' AND user_id != $2 AND ((user_sexual_preference = $1 AND user_gender = 'Female') OR (user_sexual_preference = 'Bisexual' AND user_gender = 'Female'))",
           [userData.rows[0].user_sexual_preference, user.id]
         );
       } else if (
-        userData.rows[0].user_sexual_preference === "Homosexual" &&
+        userData.rows[0].user_sexual_preference === "Heterosexual" &&
         userData.rows[0].user_gender === "Female"
       ) {
         sameSexualPreference = await pool.query(
-          "SELECT * from users WHERE user_sexual_preference = $1 AND user_gender = 'Male' AND user_id != $2 AND is_complete='t'",
+          "SELECT * from users WHERE is_complete='t' AND user_id != $2 AND ((user_sexual_preference = $1 AND user_gender = 'Male') OR (user_sexual_preference = 'Bisexual' AND user_gender = 'Male'))",
           [userData.rows[0].user_sexual_preference, user.id]
         );
       }
@@ -1021,6 +1038,9 @@ module.exports = {
           ).length,
         });
       }
+      /* browseSuggestions = lodash.reject(browseSuggestions, function (a) {
+        return a.distance > 100;
+      }); */
 
       browseSuggestions.sort(function (a, b) {
         return (

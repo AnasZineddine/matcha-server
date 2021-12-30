@@ -12,6 +12,9 @@ Create TYPE sexual_preference AS ENUM
 
 
 /*
+'Emily','Hannah','Madison','Ashley','Sarah','Alexis','Samantha','Jessica','Elizabeth','Taylor','Lauren','Alyssa','Kayla','Abigail','Brianna','Olivia','Emma','Megan','Grace','Victoria','Rachel','Anna','Sydney','Destiny','Morgan','Jennifer','Jasmine','Haley','Julia','Kaitlyn','Nicole','Amanda','Katherine','Natalie','Hailey','Alexandra','Savannah','Chloe','Rebecca','Stephanie','Maria','Sophia','Mackenzie','Allison','Isabella','Amber','Mary'
+*/
+/*
     INSERT INTO users ( 
      user_first_name,
     user_last_name,
@@ -27,9 +30,9 @@ Create TYPE sexual_preference AS ENUM
     user_interests,
     user_last_connected
     ) SELECT
-    'firstName' || round(random()*1000), -- for text
-    'lastName' || round(random()*1000), -- for text
-    'username' || round(random()*1000), -- for text
+    (ARRAY['Jacob','Michael','Matthew','Joshua','Christopher','Nicholas','Andrew','Joseph','Daniel','Tyler','William','Brandon','Ryan','John','Zachary','David','Anthony','James','Justin','Alexander','Jonathan','Christian','Austin','Dylan','Ethan','Benjamin','Noah','Samuel','Robert','Nathan','Cameron','Kevin','Thomas','Jose','Hunter','Jordan','Kyle'])[floor(random() * 35 + 1)],
+    (ARRAY['Jacob','Michael','Matthew','Joshua','Christopher','Nicholas','Andrew','Joseph','Daniel','Tyler','William','Brandon','Ryan','John','Zachary','David','Anthony','James','Justin','Alexander','Jonathan','Christian','Austin','Dylan','Ethan','Benjamin','Noah','Samuel','Robert','Nathan','Cameron','Kevin','Thomas','Jose','Hunter','Jordan','Kyle'])[floor(random() * 35 + 1)],
+    'user-' || round(random()*1000), -- for text
     'user@user.com', -- for text
     '$2a$12$8oiPfd4Y30XOakOiTaOLqe5TsEsUeeIZyfeCgRZ9ctK9WUSBtYsyq',
     't',
@@ -37,10 +40,10 @@ Create TYPE sexual_preference AS ENUM
     'Male',
     'Bisexual',
     'Lorem Ipsum',
-    round(random()*70),
+    random() * 60 + 18,
     '{movies, poker, code}',
      now() + round(random()*1000) * '1 second'::interval
-    FROM generate_series(1,500);
+    FROM generate_series(1,100);
     */
 
 CREATE TABLE users
