@@ -1432,6 +1432,48 @@ module.exports = {
       }
     },
 
+    async getWhoLooked(_, {}, context) {
+      const user = await checkAuth(context);
+      try {
+        const looked = await pool.query(
+          "SELECT from_user_id from profile_look WHERE to_user_id=$1",
+          [user.id]
+        );
+        const lookUsers = [];
+        for (let users of looked.rows) {
+          lookUsers.push({ id: users.from_user_id });
+        }
+        const ids = lookUsers.map((o) => o.id);
+        const filtered = lookUsers.filter(
+          ({ id }, index) => !ids.includes(id, index + 1)
+        );
+        return filtered;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+
+    async getWhoLiked(_, {}, context) {
+      const user = await checkAuth(context);
+      try {
+        const liked = await pool.query(
+          "SELECT from_user_id from likes WHERE to_user_id=$1",
+          [user.id]
+        );
+        const likedUsers = [];
+        for (let users of liked.rows) {
+          likedUsers.push({ id: users.from_user_id });
+        }
+        const ids = likedUsers.map((o) => o.id);
+        const filtered = likedUsers.filter(
+          ({ id }, index) => !ids.includes(id, index + 1)
+        );
+        return filtered;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+
     async getNotifications(_, {}, context) {
       const user = await checkAuth(context);
       try {

@@ -28,21 +28,27 @@ Create TYPE sexual_preference AS ENUM
     user_biography,
     user_age,
     user_interests,
-    user_last_connected
+    user_last_connected,
+    profile_picture,
+    user_lat,
+    user_lon
     ) SELECT
-    (ARRAY['Jacob','Michael','Matthew','Joshua','Christopher','Nicholas','Andrew','Joseph','Daniel','Tyler','William','Brandon','Ryan','John','Zachary','David','Anthony','James','Justin','Alexander','Jonathan','Christian','Austin','Dylan','Ethan','Benjamin','Noah','Samuel','Robert','Nathan','Cameron','Kevin','Thomas','Jose','Hunter','Jordan','Kyle'])[floor(random() * 35 + 1)],
-    (ARRAY['Jacob','Michael','Matthew','Joshua','Christopher','Nicholas','Andrew','Joseph','Daniel','Tyler','William','Brandon','Ryan','John','Zachary','David','Anthony','James','Justin','Alexander','Jonathan','Christian','Austin','Dylan','Ethan','Benjamin','Noah','Samuel','Robert','Nathan','Cameron','Kevin','Thomas','Jose','Hunter','Jordan','Kyle'])[floor(random() * 35 + 1)],
+    (ARRAY['Emily','Hannah','Madison','Ashley','Sarah','Alexis','Samantha','Jessica','Elizabeth','Taylor','Lauren','Alyssa','Kayla','Abigail','Brianna','Olivia','Emma','Megan','Grace','Victoria','Rachel','Anna','Sydney','Destiny','Morgan','Jennifer','Jasmine','Haley','Julia','Kaitlyn','Nicole','Amanda','Katherine','Natalie','Hailey','Alexandra','Savannah','Chloe','Rebecca','Stephanie','Maria','Sophia','Mackenzie','Allison','Isabella','Amber','Mary'])[floor(random() * 35 + 1)],
+    (ARRAY['Emily','Hannah','Madison','Ashley','Sarah','Alexis','Samantha','Jessica','Elizabeth','Taylor','Lauren','Alyssa','Kayla','Abigail','Brianna','Olivia','Emma','Megan','Grace','Victoria','Rachel','Anna','Sydney','Destiny','Morgan','Jennifer','Jasmine','Haley','Julia','Kaitlyn','Nicole','Amanda','Katherine','Natalie','Hailey','Alexandra','Savannah','Chloe','Rebecca','Stephanie','Maria','Sophia','Mackenzie','Allison','Isabella','Amber','Mary'])[floor(random() * 35 + 1)],
     'user-' || round(random()*1000), -- for text
-    'user@user.com', -- for text
+    'user@user.com', --for text
     '$2a$12$8oiPfd4Y30XOakOiTaOLqe5TsEsUeeIZyfeCgRZ9ctK9WUSBtYsyq',
     't',
     't',
-    'Male',
-    'Bisexual',
+    'Female',
+    'Heterosexual',
     'Lorem Ipsum',
-    random() * 60 + 18,
-    '{movies, poker, code}',
-     now() + round(random()*1000) * '1 second'::interval
+     random() * (60-18+1) + 18::int,
+    (ARRAY['{movies, poker, books}','{music, yoga, dance}', '{gaming, sport, travel}'])[floor(random() * 3 + 1)]::text[],
+     now() + round(random()*1000) * '1 second'::interval,
+     '/images/' || round(random()*50) || '-woman.jpg',
+    random() * (33.94707-33.400493+1) + 33.400493::int,
+    random() * (-6.80350+6.07382) -6.07382::int
     FROM generate_series(1,100);
     */
 

@@ -118,6 +118,8 @@ module.exports = gql`
     getMessages(from: String!): [Message]!
     getMatchedUsers: [User]!
     getNotifications: [notification]!
+    getWhoLooked: [User]!
+    getWhoLiked: [User]!
   }
 
   type Mutation @rateLimit(limit: 100, duration: 15) {
