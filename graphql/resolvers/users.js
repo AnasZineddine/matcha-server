@@ -487,7 +487,7 @@ module.exports = {
         };
       } catch (error) {
         if (typeof error === "number") {
-          throw new UserInputError("Maximum file size is 1GB");
+          throw new UserInputError("Maximum file size is 10Mb");
         }
       }
     },
