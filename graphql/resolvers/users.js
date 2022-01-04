@@ -10,6 +10,8 @@ var xhr = new XMLHttpRequest();
 var lodash = require("lodash");
 
 const pool = require("../../db");
+const util = require("util");
+
 const {
   validateRegisterInput,
   validateLoginInput,
@@ -44,6 +46,20 @@ function generateRandomString(length) {
   }
   return result.join("");
 }
+
+const checkFileSize = (createReadStream, maxSize) =>
+  new Promise((resolves, rejects) => {
+    let filesize = 0;
+    let stream = createReadStream();
+    stream.on("data", (chunk) => {
+      filesize += chunk.length;
+      if (filesize > maxSize) {
+        rejects(filesize);
+      }
+    });
+    stream.on("end", () => resolves(filesize));
+    stream.on("error", rejects);
+  });
 
 module.exports = {
   Mutation: {
@@ -419,7 +435,11 @@ module.exports = {
         const { ext } = path.parse(filename);
         const randomName = generateRandomString(50) + ext;
         const stream = await createReadStream();
-        console.log({ mimetype, ext });
+
+        if (mimetype !== "image/jpeg" && mimetype !== "image/png") {
+          throw new UserInputError("Invalid file only jpeg and png accepted");
+        }
+
         if (
           !fs.existsSync(path.join(__dirname, `/public/images/${user.id}/`))
         ) {
@@ -436,6 +456,10 @@ module.exports = {
           stream.pipe(writeStream).on("finish", resolve).on("error", reject);
         });
         const url = `/images/${user.id}/${randomName}`;
+
+        const tenMega = 10000000;
+        await checkFileSize(createReadStream, tenMega);
+
         if (type === "profile") {
           await pool.query(
             "UPDATE users SET profile_picture = $1 WHERE user_id = $2",
@@ -462,7 +486,9 @@ module.exports = {
           url: url,
         };
       } catch (error) {
-        console.log(error);
+        if (typeof error === "number") {
+          throw new UserInputError("Maximum file size is 1GB");
+        }
       }
     },
 

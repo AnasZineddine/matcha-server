@@ -48,10 +48,6 @@ const server = new ApolloServer({
       onLimit,
     }),
   },
-  uploads: {
-    maxFileSize: 10000000, // 10 MB
-    maxFiles: 10,
-  },
   context: ({ req, connection }) => ({ req, connection, pubsub }),
   introspection: true,
   playground: true,
