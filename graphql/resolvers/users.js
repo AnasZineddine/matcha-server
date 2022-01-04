@@ -433,6 +433,7 @@ module.exports = {
         const user = await checkAuth(context);
         const { createReadStream, filename, mimetype, encoding } = await file;
         const { ext } = path.parse(filename);
+
         const randomName = generateRandomString(50) + ext;
         const stream = await createReadStream();
 
@@ -1084,7 +1085,7 @@ module.exports = {
       //TODO:Do the same for all search criteria and check input validity
       //end of testing arguments for search
       const argsFormatted = JSON.parse(JSON.stringify(args));
-      console.log(argsFormatted);
+      //console.log(argsFormatted);
       if (argsFormatted.hasOwnProperty("filterBy")) {
         if (
           argsFormatted.filterBy.hasOwnProperty("age") &&
@@ -1217,7 +1218,7 @@ module.exports = {
         }
       }
 
-      console.table(browseSuggestions);
+      // console.table(browseSuggestions);
       return browseSuggestions;
     },
 
