@@ -4,7 +4,7 @@ const { generateToken } = require("../util/generateToken");
 
 // Gmail transporter
 
-/*var transporter = nodemailer.createTransport({
+var transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
   port: 587,
   secure: false,
@@ -13,19 +13,19 @@ const { generateToken } = require("../util/generateToken");
     user: `${process.env.email}`,
     pass: `${process.env.password}`,
   },
-});*/
+});
 
 // http://ethereal.email/ Transporter
 //FIXME: ethereal email can crash the server sometimes don t use in defense !
 
-const transporter = nodemailer.createTransport({
+/*const transporter = nodemailer.createTransport({
   host: "smtp.ethereal.email",
   port: 587,
   auth: {
     user: `${process.env.email}`,
     pass: `${process.env.password}`,
   },
-});
+});*/
 
 const sendConfirmationEmail = (user) => {
   const token = generateToken(user);
