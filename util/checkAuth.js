@@ -27,7 +27,7 @@ module.exports = async (context) => {
         throw new AuthenticationError("Invalid/expired token");
       }
     }
-    throw new Error("Authentication token must be 'Bearer [token]");
+    throw new Error("Authentication token must be 'Bearer [token]'");
   } else if (context.connection && context.connection.context.Authorization) {
     const token = context.connection.context.Authorization.split("Bearer ")[1];
     if (token) {
@@ -47,7 +47,7 @@ module.exports = async (context) => {
         throw new AuthenticationError("Invalid/expired token");
       }
     }
-    throw new Error("Authentication token must be 'Bearer [token]");
+    throw new Error("Authentication token must be 'Bearer [token]'");
   }
   throw new Error("Authorization header must be provided");
 };

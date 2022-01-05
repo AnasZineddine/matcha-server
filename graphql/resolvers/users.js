@@ -351,6 +351,18 @@ module.exports = {
         throw new Error("Email must be a valid email address");
       }
       try {
+        const userEmail = await pool.query(
+          "SELECT * FROM users WHERE user_email = $1 AND user_id != $2",
+          [email, user.id]
+        );
+
+        if (userEmail.rows.length !== 0) {
+          throw new UserInputError("email already in use", {
+            errors: {
+              email: "This email is already in use", // for frontend
+            },
+          });
+        }
         await pool.query(
           "UPDATE users SET user_email = $1 WHERE user_id = $2",
           [email.trim(), user.id]
@@ -436,7 +448,6 @@ module.exports = {
 
         const randomName = generateRandomString(50) + ext;
         const stream = await createReadStream();
-
         if (mimetype !== "image/jpeg" && mimetype !== "image/png") {
           throw new UserInputError("Invalid file only jpeg and png accepted");
         }
@@ -487,6 +498,7 @@ module.exports = {
           url: url,
         };
       } catch (error) {
+        console.log(error);
         if (typeof error === "number") {
           throw new UserInputError("Maximum file size is 10Mb");
         }
@@ -915,7 +927,12 @@ module.exports = {
                 "UPDATE users SET regular_pictures = array_remove(regular_pictures , $1) WHERE user_id = $2",
                 [url, user.id]
               );
-              fs.unlinkSync(pathName);
+              if (fs.existsSync(pathName)) {
+                fs.unlinkSync(pathName);
+                // Do something
+              } else {
+                throw new UserInputError("picture does not exist");
+              }
               return true;
             }
           }
