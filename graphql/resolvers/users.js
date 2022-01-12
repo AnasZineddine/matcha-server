@@ -449,7 +449,10 @@ module.exports = {
         const randomName = generateRandomString(50) + ext;
         const stream = await createReadStream();
         if (mimetype !== "image/jpeg" && mimetype !== "image/png") {
-          throw new UserInputError("Invalid file only jpeg and png accepted");
+          //context.req.res.sendStatus(403).send("dsfsdfsdf");
+          // Throwing ApolloError could also work,
+          // in which case response object would not be required, but not tested.
+          throw new UserInputError("invalid file type");
         }
 
         if (

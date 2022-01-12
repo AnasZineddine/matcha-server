@@ -2,6 +2,8 @@ const { ApolloServer, PubSub } = require("apollo-server-express");
 const express = require("express");
 const http = require("http");
 
+const cors = require("cors");
+
 const {
   createRateLimitDirective,
   createRateLimitTypeDef,
@@ -60,10 +62,15 @@ const httpServer = http.createServer(app);
 server.installSubscriptionHandlers(httpServer);
 
 app.use(express.static("graphql/resolvers/public"));
+var corsOptions = {
+  origin: "http://localhost:3000",
+  credentials: true, // <-- REQUIRED backend setting
+};
+app.use(cors(corsOptions));
 
 httpServer.listen({ port: port }, () =>
   console.log(
-    `🚀 Server ready at http://localhost:${port}${server.graphqlPath}`
+    `💩🚀 Server ready at http://localhost:${port}${server.graphqlPath}`
   )
 );
 /*server.listen({ port: port }).then((res) => {
