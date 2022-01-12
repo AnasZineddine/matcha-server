@@ -10,6 +10,7 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/matcha?schema=public
     volumes:
       - postgres:/var/lib/postgresql/data
       - ./database.sql:/docker-entrypoint-initdb.d/database.sql
