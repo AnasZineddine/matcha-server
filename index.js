@@ -40,7 +40,7 @@ const onLimit = (resource, directiveArgs, obj, args, context, info) => {
 
 const server = new ApolloServer({
   cors: {
-    origin: "http://localhost:3000", // <- allow request from all domains
+    origin: "http://localhost:6969", // <- allow request from all domains
     credentials: true,
   },
   typeDefs: [createRateLimitTypeDef(), typeDefs],
@@ -62,8 +62,6 @@ const httpServer = http.createServer(app);
 server.installSubscriptionHandlers(httpServer);
 
 app.use(express.static("graphql/resolvers/public"));
-app.use(cors());
-app.options("*", cors());
 
 httpServer.listen({ port: port }, () =>
   console.log(
