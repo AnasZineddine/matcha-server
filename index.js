@@ -62,11 +62,8 @@ const httpServer = http.createServer(app);
 server.installSubscriptionHandlers(httpServer);
 
 app.use(express.static("graphql/resolvers/public"));
-var corsOptions = {
-  origin: "http://localhost:6969",
-  credentials: true, // <-- REQUIRED backend setting
-};
-app.use(cors(corsOptions));
+app.use(cors());
+app.options("*", cors());
 
 httpServer.listen({ port: port }, () =>
   console.log(
