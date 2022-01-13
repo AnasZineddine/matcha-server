@@ -29,7 +29,7 @@ var transporter = nodemailer.createTransport({
 
 const sendConfirmationEmail = (user) => {
   const token = generateToken(user);
-  const url = `http://localhost:3000/confirmation/${token}`;
+  const url = `http://localhost:6969/confirmation/${token}`;
 
   transporter.sendMail({
     from: `${process.env.email}`,
