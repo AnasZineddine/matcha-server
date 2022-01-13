@@ -92,8 +92,8 @@ module.exports = {
       const options = {
         maxAge: 1000 * 60 * 60 * 24, //expires in a day
         httpOnly: true, // cookie is only accessible by the server
-        // secure: process.env.NODE_ENV === 'prod', // only transferred over https
-        // sameSite: true, // only sent for requests to the same FQDN as the domain in the cookie
+        secure: false, // only transferred over https
+        sameSite: "lax", // only sent for requests to the same FQDN as the domain in the cookie
       };
       const cookie = req.res.cookie("refresh_token", token, options);
 
@@ -452,7 +452,11 @@ module.exports = {
           //context.req.res.sendStatus(403).send("dsfsdfsdf");
           // Throwing ApolloError could also work,
           // in which case response object would not be required, but not tested.
-          throw new UserInputError("invalid file type");
+
+          return {
+            success: false,
+            message: "File type not supported",
+          };
         }
 
         if (
@@ -498,12 +502,18 @@ module.exports = {
           );
         }
         return {
+          success: true,
+          message: "File uploaded",
           url: url,
         };
       } catch (error) {
         console.log(error);
         if (typeof error === "number") {
-          throw new UserInputError("Maximum file size is 10Mb");
+          //throw new UserInputError("Maximum file size is 10Mb");
+          return {
+            success: false,
+            message: "Maximum file size is 10Mb",
+          };
         }
       }
     },

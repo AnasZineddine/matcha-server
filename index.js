@@ -40,7 +40,7 @@ const onLimit = (resource, directiveArgs, obj, args, context, info) => {
 
 const server = new ApolloServer({
   cors: {
-    origin: "http://localhost:6969", // <- allow request from all domains
+    origin: "http://10.11.6.8:6969", // <- allow request from all domains
     credentials: true,
   },
   typeDefs: [createRateLimitTypeDef(), typeDefs],
@@ -58,6 +58,12 @@ const server = new ApolloServer({
 const app = express();
 server.applyMiddleware({ app });
 
+var corsOptions = {
+  origin: "*",
+  credentials: true, // <-- REQUIRED backend setting
+};
+app.use(cors(corsOptions));
+
 const httpServer = http.createServer(app);
 server.installSubscriptionHandlers(httpServer);
 
@@ -65,7 +71,7 @@ app.use(express.static("graphql/resolvers/public"));
 
 httpServer.listen({ port: port }, () =>
   console.log(
-    `💩🚀 Server ready at http://localhost:${port}${server.graphqlPath}`
+    `🚀 Server ready at http://localhost:${port}${server.graphqlPath}`
   )
 );
 /*server.listen({ port: port }).then((res) => {

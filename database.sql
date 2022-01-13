@@ -1,5 +1,7 @@
 CREATE DATABASE matcha;
 
+\c matcha;
+
 --download exstension
 create extension
 if not exists "uuid-ossp";
@@ -156,5 +158,221 @@ $$;
         to_user_id VARCHAR (255) NOT NULL,
         timestamp timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
     );
+
+    INSERT INTO users ( 
+     user_first_name,
+    user_last_name,
+    username,
+    user_email,
+    user_password,
+    is_verified,
+    is_complete,
+    user_gender,
+    user_sexual_preference,
+    user_biography,
+    user_age,
+    user_interests,
+    user_last_connected,
+    profile_picture,
+    user_lat,
+    user_lon
+    ) SELECT
+    (ARRAY['Emily','Hannah','Madison','Ashley','Sarah','Alexis','Samantha','Jessica','Elizabeth','Taylor','Lauren','Alyssa','Kayla','Abigail','Brianna','Olivia','Emma','Megan','Grace','Victoria','Rachel','Anna','Sydney','Destiny','Morgan','Jennifer','Jasmine','Haley','Julia','Kaitlyn','Nicole','Amanda','Katherine','Natalie','Hailey','Alexandra','Savannah','Chloe','Rebecca','Stephanie','Maria','Sophia','Mackenzie','Allison','Isabella','Amber','Mary'])[floor(random() * 35 + 1)],
+    (ARRAY['Emily','Hannah','Madison','Ashley','Sarah','Alexis','Samantha','Jessica','Elizabeth','Taylor','Lauren','Alyssa','Kayla','Abigail','Brianna','Olivia','Emma','Megan','Grace','Victoria','Rachel','Anna','Sydney','Destiny','Morgan','Jennifer','Jasmine','Haley','Julia','Kaitlyn','Nicole','Amanda','Katherine','Natalie','Hailey','Alexandra','Savannah','Chloe','Rebecca','Stephanie','Maria','Sophia','Mackenzie','Allison','Isabella','Amber','Mary'])[floor(random() * 35 + 1)],
+    'user-' || round(random()*1000), -- for text
+    'user@user.com', --for text
+    '$2a$12$8oiPfd4Y30XOakOiTaOLqe5TsEsUeeIZyfeCgRZ9ctK9WUSBtYsyq',
+    't',
+    't',
+    'Female',
+    'Heterosexual',
+    'Lorem Ipsum',
+     random() * (60-18+1) + 18::int,
+    (ARRAY['{movies, poker, books}','{music, yoga, dance}', '{gaming, sport, travel}'])[floor(random() * 3 + 1)]::text[],
+     now() + round(random()*1000) * '1 second'::interval,
+     '/images/' || round(random()*50) || '-woman.jpg',
+    random() * (33.94707-33.400493+1) + 33.400493::int,
+    random() * (-6.80350+6.07382) -6.07382::int
+    FROM generate_series(1,100);
+
+    INSERT INTO users ( 
+     user_first_name,
+    user_last_name,
+    username,
+    user_email,
+    user_password,
+    is_verified,
+    is_complete,
+    user_gender,
+    user_sexual_preference,
+    user_biography,
+    user_age,
+    user_interests,
+    user_last_connected,
+    profile_picture,
+    user_lat,
+    user_lon
+    ) SELECT
+    (ARRAY['Emily','Hannah','Madison','Ashley','Sarah','Alexis','Samantha','Jessica','Elizabeth','Taylor','Lauren','Alyssa','Kayla','Abigail','Brianna','Olivia','Emma','Megan','Grace','Victoria','Rachel','Anna','Sydney','Destiny','Morgan','Jennifer','Jasmine','Haley','Julia','Kaitlyn','Nicole','Amanda','Katherine','Natalie','Hailey','Alexandra','Savannah','Chloe','Rebecca','Stephanie','Maria','Sophia','Mackenzie','Allison','Isabella','Amber','Mary'])[floor(random() * 35 + 1)],
+    (ARRAY['Emily','Hannah','Madison','Ashley','Sarah','Alexis','Samantha','Jessica','Elizabeth','Taylor','Lauren','Alyssa','Kayla','Abigail','Brianna','Olivia','Emma','Megan','Grace','Victoria','Rachel','Anna','Sydney','Destiny','Morgan','Jennifer','Jasmine','Haley','Julia','Kaitlyn','Nicole','Amanda','Katherine','Natalie','Hailey','Alexandra','Savannah','Chloe','Rebecca','Stephanie','Maria','Sophia','Mackenzie','Allison','Isabella','Amber','Mary'])[floor(random() * 35 + 1)],
+    'user-' || round(random()*1000), -- for text
+    'user@user.com', --for text
+    '$2a$12$8oiPfd4Y30XOakOiTaOLqe5TsEsUeeIZyfeCgRZ9ctK9WUSBtYsyq',
+    't',
+    't',
+    'Female',
+    'Homosexual',
+    'Lorem Ipsum',
+     random() * (60-18+1) + 18::int,
+    (ARRAY['{movies, poker, books}','{music, yoga, dance}', '{gaming, sport, travel}'])[floor(random() * 3 + 1)]::text[],
+     now() + round(random()*1000) * '1 second'::interval,
+     '/images/' || round(random()*50) || '-woman.jpg',
+    random() * (33.94707-33.400493+1) + 33.400493::int,
+    random() * (-6.80350+6.07382) -6.07382::int
+    FROM generate_series(1,100);
+
+    INSERT INTO users ( 
+     user_first_name,
+    user_last_name,
+    username,
+    user_email,
+    user_password,
+    is_verified,
+    is_complete,
+    user_gender,
+    user_sexual_preference,
+    user_biography,
+    user_age,
+    user_interests,
+    user_last_connected,
+    profile_picture,
+    user_lat,
+    user_lon
+    ) SELECT
+    (ARRAY['Emily','Hannah','Madison','Ashley','Sarah','Alexis','Samantha','Jessica','Elizabeth','Taylor','Lauren','Alyssa','Kayla','Abigail','Brianna','Olivia','Emma','Megan','Grace','Victoria','Rachel','Anna','Sydney','Destiny','Morgan','Jennifer','Jasmine','Haley','Julia','Kaitlyn','Nicole','Amanda','Katherine','Natalie','Hailey','Alexandra','Savannah','Chloe','Rebecca','Stephanie','Maria','Sophia','Mackenzie','Allison','Isabella','Amber','Mary'])[floor(random() * 35 + 1)],
+    (ARRAY['Emily','Hannah','Madison','Ashley','Sarah','Alexis','Samantha','Jessica','Elizabeth','Taylor','Lauren','Alyssa','Kayla','Abigail','Brianna','Olivia','Emma','Megan','Grace','Victoria','Rachel','Anna','Sydney','Destiny','Morgan','Jennifer','Jasmine','Haley','Julia','Kaitlyn','Nicole','Amanda','Katherine','Natalie','Hailey','Alexandra','Savannah','Chloe','Rebecca','Stephanie','Maria','Sophia','Mackenzie','Allison','Isabella','Amber','Mary'])[floor(random() * 35 + 1)],
+    'user-' || round(random()*1000), -- for text
+    'user@user.com', --for text
+    '$2a$12$8oiPfd4Y30XOakOiTaOLqe5TsEsUeeIZyfeCgRZ9ctK9WUSBtYsyq',
+    't',
+    't',
+    'Female',
+    'Bisexual',
+    'Lorem Ipsum',
+     random() * (60-18+1) + 18::int,
+    (ARRAY['{movies, poker, books}','{music, yoga, dance}', '{gaming, sport, travel}'])[floor(random() * 3 + 1)]::text[],
+     now() + round(random()*1000) * '1 second'::interval,
+     '/images/' || round(random()*50) || '-woman.jpg',
+    random() * (33.94707-33.400493+1) + 33.400493::int,
+    random() * (-6.80350+6.07382) -6.07382::int
+    FROM generate_series(1,100);
+
+    INSERT INTO users ( 
+     user_first_name,
+    user_last_name,
+    username,
+    user_email,
+    user_password,
+    is_verified,
+    is_complete,
+    user_gender,
+    user_sexual_preference,
+    user_biography,
+    user_age,
+    user_interests,
+    user_last_connected,
+    profile_picture,
+    user_lat,
+    user_lon
+    ) SELECT
+    (ARRAY['Jacob','Michael','Matthew','Joshua','Christopher','Nicholas','Andrew','Joseph','Daniel','Tyler','William','Brandon','Ryan','John','Zachary','David','Anthony','James','Justin','Alexander','Jonathan','Christian','Austin','Dylan','Ethan','Benjamin','Noah','Samuel','Robert','Nathan','Cameron','Kevin','Thomas','Jose','Hunter'])[floor(random() * 35 + 1)],
+    (ARRAY['Emily','Hannah','Madison','Ashley','Sarah','Alexis','Samantha','Jessica','Elizabeth','Taylor','Lauren','Alyssa','Kayla','Abigail','Brianna','Olivia','Emma','Megan','Grace','Victoria','Rachel','Anna','Sydney','Destiny','Morgan','Jennifer','Jasmine','Haley','Julia','Kaitlyn','Nicole','Amanda','Katherine','Natalie','Hailey','Alexandra','Savannah','Chloe','Rebecca','Stephanie','Maria','Sophia','Mackenzie','Allison','Isabella','Amber','Mary'])[floor(random() * 35 + 1)],
+    'user-' || round(random()*1000), -- for text
+    'user@user.com', --for text
+    '$2a$12$8oiPfd4Y30XOakOiTaOLqe5TsEsUeeIZyfeCgRZ9ctK9WUSBtYsyq',
+    't',
+    't',
+    'Male',
+    'Heterosexual',
+    'Lorem Ipsum',
+     random() * (60-18+1) + 18::int,
+    (ARRAY['{movies, poker, books}','{music, yoga, dance}', '{gaming, sport, travel}'])[floor(random() * 3 + 1)]::text[],
+     now() + round(random()*1000) * '1 second'::interval,
+     '/images/' || round(random()*50) || '.jpg',
+    random() * (33.94707-33.400493+1) + 33.400493::int,
+    random() * (-6.80350+6.07382) -6.07382::int
+    FROM generate_series(1,100);
+
+     INSERT INTO users ( 
+     user_first_name,
+    user_last_name,
+    username,
+    user_email,
+    user_password,
+    is_verified,
+    is_complete,
+    user_gender,
+    user_sexual_preference,
+    user_biography,
+    user_age,
+    user_interests,
+    user_last_connected,
+    profile_picture,
+    user_lat,
+    user_lon
+    ) SELECT
+    (ARRAY['Jacob','Michael','Matthew','Joshua','Christopher','Nicholas','Andrew','Joseph','Daniel','Tyler','William','Brandon','Ryan','John','Zachary','David','Anthony','James','Justin','Alexander','Jonathan','Christian','Austin','Dylan','Ethan','Benjamin','Noah','Samuel','Robert','Nathan','Cameron','Kevin','Thomas','Jose','Hunter'])[floor(random() * 35 + 1)],
+    (ARRAY['Emily','Hannah','Madison','Ashley','Sarah','Alexis','Samantha','Jessica','Elizabeth','Taylor','Lauren','Alyssa','Kayla','Abigail','Brianna','Olivia','Emma','Megan','Grace','Victoria','Rachel','Anna','Sydney','Destiny','Morgan','Jennifer','Jasmine','Haley','Julia','Kaitlyn','Nicole','Amanda','Katherine','Natalie','Hailey','Alexandra','Savannah','Chloe','Rebecca','Stephanie','Maria','Sophia','Mackenzie','Allison','Isabella','Amber','Mary'])[floor(random() * 35 + 1)],
+    'user-' || round(random()*1000), -- for text
+    'user@user.com', --for text
+    '$2a$12$8oiPfd4Y30XOakOiTaOLqe5TsEsUeeIZyfeCgRZ9ctK9WUSBtYsyq',
+    't',
+    't',
+    'Male',
+    'Bisexual',
+    'Lorem Ipsum',
+     random() * (60-18+1) + 18::int,
+    (ARRAY['{movies, poker, books}','{music, yoga, dance}', '{gaming, sport, travel}'])[floor(random() * 3 + 1)]::text[],
+     now() + round(random()*1000) * '1 second'::interval,
+     '/images/' || round(random()*50) || '.jpg',
+    random() * (33.94707-33.400493+1) + 33.400493::int,
+    random() * (-6.80350+6.07382) -6.07382::int
+    FROM generate_series(1,100);
+
+     INSERT INTO users ( 
+     user_first_name,
+    user_last_name,
+    username,
+    user_email,
+    user_password,
+    is_verified,
+    is_complete,
+    user_gender,
+    user_sexual_preference,
+    user_biography,
+    user_age,
+    user_interests,
+    user_last_connected,
+    profile_picture,
+    user_lat,
+    user_lon
+    ) SELECT
+    (ARRAY['Jacob','Michael','Matthew','Joshua','Christopher','Nicholas','Andrew','Joseph','Daniel','Tyler','William','Brandon','Ryan','John','Zachary','David','Anthony','James','Justin','Alexander','Jonathan','Christian','Austin','Dylan','Ethan','Benjamin','Noah','Samuel','Robert','Nathan','Cameron','Kevin','Thomas','Jose','Hunter'])[floor(random() * 35 + 1)],
+    (ARRAY['Emily','Hannah','Madison','Ashley','Sarah','Alexis','Samantha','Jessica','Elizabeth','Taylor','Lauren','Alyssa','Kayla','Abigail','Brianna','Olivia','Emma','Megan','Grace','Victoria','Rachel','Anna','Sydney','Destiny','Morgan','Jennifer','Jasmine','Haley','Julia','Kaitlyn','Nicole','Amanda','Katherine','Natalie','Hailey','Alexandra','Savannah','Chloe','Rebecca','Stephanie','Maria','Sophia','Mackenzie','Allison','Isabella','Amber','Mary'])[floor(random() * 35 + 1)],
+    'user-' || round(random()*1000), -- for text
+    'user@user.com', --for text
+    '$2a$12$8oiPfd4Y30XOakOiTaOLqe5TsEsUeeIZyfeCgRZ9ctK9WUSBtYsyq',
+    't',
+    't',
+    'Male',
+    'Homosexual',
+    'Lorem Ipsum',
+     random() * (60-18+1) + 18::int,
+    (ARRAY['{movies, poker, books}','{music, yoga, dance}', '{gaming, sport, travel}'])[floor(random() * 3 + 1)]::text[],
+     now() + round(random()*1000) * '1 second'::interval,
+     '/images/' || round(random()*50) || '.jpg',
+    random() * (33.94707-33.400493+1) + 33.400493::int,
+    random() * (-6.80350+6.07382) -6.07382::int
+    FROM generate_series(1,100);
 
     
