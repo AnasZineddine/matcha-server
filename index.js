@@ -40,7 +40,7 @@ const onLimit = (resource, directiveArgs, obj, args, context, info) => {
 
 const server = new ApolloServer({
   cors: {
-    origin: "http://10.11.6.8:6969", // <- allow request from all domains
+    origin: "http://localhost:6969", // <- allow request from all domains
     credentials: true,
   },
   typeDefs: [createRateLimitTypeDef(), typeDefs],
@@ -51,8 +51,8 @@ const server = new ApolloServer({
     }),
   },
   context: ({ req, connection }) => ({ req, connection, pubsub }),
-  introspection: true,
-  playground: true,
+	introspection: false,
+  	playground: false,
 });
 
 const app = express();
